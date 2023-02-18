@@ -3,8 +3,8 @@ package routes
 import (
 	"net/http"
 
-	ctrl "github.com/phillip-england/go-http/controllers/location"
-	mid "github.com/phillip-england/go-http/middleware"
+	ctrl "github.com/phillip-england/go-http/ctrl/location"
+	"github.com/phillip-england/go-http/mid"
 )
 
 func LocationRoutes() {

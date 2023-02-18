@@ -3,8 +3,8 @@ package routes
 import (
 	"net/http"
 
-	ctrl "github.com/phillip-england/go-http/controllers/user"
-	mid "github.com/phillip-england/go-http/middleware"
+	ctrl "github.com/phillip-england/go-http/ctrl/user"
+	"github.com/phillip-england/go-http/mid"
 )
 
 func UserRoutes() {
