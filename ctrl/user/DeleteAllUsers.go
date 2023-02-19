@@ -10,14 +10,18 @@ import (
 
 func DeleteAllUsers(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method != "GET" {
+	if r.Method != "DELETE" {
 		net.MessageResponse(w, "invalid request method", http.StatusBadRequest)
 		return
 	}
 
 	ctx, client, disconnect := db.Connect()
 	defer disconnect()
+
 	coll := db.Collection(client, "users")
+	coll.DeleteMany(ctx, bson.D{})
+
+	coll = db.Collection(client, "locations")
 	coll.DeleteMany(ctx, bson.D{})
 
 	net.MessageResponse(w, "success", 200)

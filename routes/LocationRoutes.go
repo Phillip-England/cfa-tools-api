@@ -24,4 +24,9 @@ func LocationRoutes() {
 		mid.Preflight(
 		mid.Auth(ctrl.GetLocation))))
 
+		http.HandleFunc("/location/delete/",
+		mid.CORS(
+		mid.Preflight(
+		mid.Auth(ctrl.DeleteLocation))))
+
 }

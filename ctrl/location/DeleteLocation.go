@@ -1,9 +1,7 @@
 package ctrl
 
 import (
-	"encoding/json"
 	"net/http"
-	"strings"
 
 	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/model"
@@ -13,30 +11,29 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetLocation(w http.ResponseWriter, r *http.Request) {
+func DeleteLocation(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method != "GET" {
-		net.MessageResponse(w, "invalid request method", 400)
+	if r.Method != "DELETE" {
+		net.InvalidRequestMethod(w)
 		return
 	}
 
-	parts := strings.Split(r.URL.Path, "/")
-	id := parts[len(parts)-1]
+	id := net.GetURLParam(r.URL.Path)
 	locationID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		net.ServerError(w)
+		net.ResourceNotFound(w)
 		return
 	}
-
+	
 	const userKey model.ContextKey = "user"
 	user := r.Context().Value(userKey).(model.User)
 
 	ctx, client, disconnect := db.Connect()
 	defer disconnect()
 	coll := db.Collection(client, "locations")
-
+	
+	var location model.Location
 	filter := bson.D{{Key: "_id", Value: locationID}}
-	var location model.LocationResponse
 	err = coll.FindOne(ctx, filter).Decode(&location)
 	if err == mongo.ErrNoDocuments {
 		net.ResourceNotFound(w)
@@ -46,23 +43,17 @@ func GetLocation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if location.User != user.ID {
+	if user.ID != location.User {
 		net.Forbidden(w)
 		return
 	}
 
-	httpResponse := model.HttpResponse{
-		Message: "success",
-		Data: location,
-	}
-
-	jsonData, err := json.Marshal(httpResponse)
+	_, err = coll.DeleteOne(ctx, filter)
 	if err != nil {
 		net.ServerError(w)
 		return
 	}
-	
-	w.WriteHeader(200)
-	w.Write(jsonData)
+
+	net.Success(w)
 
 }

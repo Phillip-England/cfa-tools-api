@@ -2,7 +2,6 @@ package ctrl
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 
 	"github.com/phillip-england/go-http/db"
@@ -35,7 +34,6 @@ func GetLocations(w http.ResponseWriter, r *http.Request) {
 
 	var locations []model.LocationResponse
 	for cursor.Next(ctx) {
-		log.Println("hit")
 		var location model.LocationResponse
 		if err := cursor.Decode(&location); err != nil {
 			net.ServerError(w)
