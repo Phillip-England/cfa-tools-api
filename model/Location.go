@@ -15,6 +15,23 @@ type Location struct {
 	Number  string `json:"number" bson:"number"`
 }
 
+type LocationResponse struct {
+	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	User 			primitive.ObjectID `json:"user,omitempty" bson:"user,omitempty"`
+	Name     string `json:"name" bson:"name"`
+	Number  string `json:"number" bson:"number"`
+}
+
+func BuildLocation(userID primitive.ObjectID, name string, number string) (location Location, err error) {
+	location = Location{
+		User: userID,
+		Name: name,
+		Number: number,
+	}
+	location.Timestamp()
+	return location, nil
+}
+
 func (v *Location) Timestamp() {
 	now := time.Now()
 	if v.CreatedAt.IsZero() {

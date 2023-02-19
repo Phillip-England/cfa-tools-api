@@ -24,7 +24,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	// user := r.Context().Value(userKey).(model.User)
 
 	body := requestBody{}
-	err := net.GetBodyNew(w, r, &body)
+	err := net.GetBody(w, r, &body)
 	if err != nil {
 		net.ServerError(w, err)
 		return

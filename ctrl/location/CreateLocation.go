@@ -1,7 +1,6 @@
 package ctrl
 
 import (
-	"encoding/json"
 	"net/http"
 
 	"github.com/phillip-england/go-http/db"
@@ -15,23 +14,27 @@ func CreateLocation(w http.ResponseWriter, r *http.Request) {
 		net.InvalidRequestMethod(w)
 		return
 	}
-
-	const userKey model.ContextKey = "user"
-	user := r.Context().Value(userKey).(model.User)
-
-	body, err := net.GetBody(w, r)
-	if err != nil {
-		net.ServerError(w, err)
+	
+	type requestBody struct {
+		Name string `json:"name"`
+		Number string `json:"number"`
 	}
-
-	var location model.Location
-	err = json.Unmarshal(body, &location)
+	
+	body := requestBody{}
+	err := net.GetBody(w, r, &body)
 	if err != nil {
 		net.ServerError(w, err)
 		return
 	}
-	location.Timestamp()
-	location.User = user.ID
+	
+	const userKey model.ContextKey = "user"
+	user := r.Context().Value(userKey).(model.User)
+
+	location, err := model.BuildLocation(user.ID, body.Name, body.Number)
+	if err != nil {
+		net.ServerError(w, err)
+		return
+	}
 
 	ctx, client, disconnect := db.Connect()
 	defer disconnect()

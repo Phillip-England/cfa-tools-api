@@ -1,7 +1,6 @@
 package ctrl
 
 import (
-	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -13,6 +12,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+
+
+
 func LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
@@ -20,30 +22,33 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := net.GetBody(w, r)
+	type requestBody struct {
+		Email string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	body := requestBody{}
+	err := net.GetBody(w, r, &body)
 	if err != nil {
 		net.ServerError(w, err)
 		return
 	}
 
-	var user model.User
-	err = json.Unmarshal(body, &user)
-	if err != nil {
-		net.ServerError(w, err)
-		return
-	}
-	user.Email = strings.ToLower(user.Email)
+	body.Email = strings.ToLower(body.Email)
 
 	ctx, client, disconnect := db.Connect()
 	defer disconnect()
 	coll := db.Collection(client, "users")
 
 	var userExists model.User
-	filter := bson.D{{Key: "email", Value: user.Email}}
+	filter := bson.D{{Key: "email", Value: body.Email}}
 	err = coll.FindOne(ctx, filter).Decode(&userExists)
 
 	if err == mongo.ErrNoDocuments {
 		net.MessageResponse(w, "invalid credentials", 400)
+		return
+	} else if err != nil {
+		net.ServerError(w, err)
 		return
 	}
 
@@ -53,7 +58,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if user.Password != string(decryptedPasswordBytes) {
+	if body.Password != string(decryptedPasswordBytes) {
 		net.MessageResponse(w, "invalid credentials", 400)
 		return
 	}

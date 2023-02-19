@@ -1,9 +1,7 @@
 package ctrl
 
 import (
-	"encoding/json"
 	"net/http"
-	"strings"
 
 	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/lib"
@@ -21,27 +19,22 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body, err := net.GetBody(w, r)
+	type requestBody struct {
+		Email string `json:"email"`
+		Password string `json:"password"`
+	}
+
+	body := requestBody{}
+	err := net.GetBody(w, r, &body)
 	if err != nil {
 		net.ServerError(w, err)
 		return
 	}
 
-	var user model.User
-	err = json.Unmarshal(body, &user)
+	user, err := model.BuildUser(body.Email, body.Password)
 	if err != nil {
 		net.ServerError(w, err)
-		return
 	}
-
-	user.Timestamp()
-	user.Email = strings.ToLower(user.Email)
-	encryptedPassword, err := lib.Encrypt([]byte(user.Password))
-	if err != nil {
-		net.ServerError(w, err)
-		return
-	}
-	user.Password = string(encryptedPassword)
 	
 	ctx, client, disconnect := db.Connect()
 	defer disconnect()
@@ -74,6 +67,6 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	net.HttpCookie(w, "token", signedString, 30)
 	
-	net.MessageResponse(w, "success", 200)
+	net.Success(w)
 
 }
