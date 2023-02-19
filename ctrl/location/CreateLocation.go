@@ -12,18 +12,22 @@ import (
 func CreateLocation(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
-		net.MessageResponse(w, "invalid request method", 400)
+		net.InvalidRequestMethod(w)
 		return
 	}
 
 	const userKey model.ContextKey = "user"
 	user := r.Context().Value(userKey).(model.User)
 
-	body := net.GetBody(w, r)
-	var location model.Location
-	err := json.Unmarshal(body, &location)
+	body, err := net.GetBody(w, r)
 	if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
+	}
+
+	var location model.Location
+	err = json.Unmarshal(body, &location)
+	if err != nil {
+		net.ServerError(w, err)
 		return
 	}
 	location.Timestamp()
@@ -35,9 +39,9 @@ func CreateLocation(w http.ResponseWriter, r *http.Request) {
 
 	_, err = coll.InsertOne(ctx, location)
 	if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
 		return
 	}
 
-	net.MessageResponse(w, "success", 200)
+	net.Success(w)
 }

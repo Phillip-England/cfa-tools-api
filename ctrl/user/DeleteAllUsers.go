@@ -11,7 +11,7 @@ import (
 func DeleteAllUsers(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "DELETE" {
-		net.MessageResponse(w, "invalid request method", http.StatusBadRequest)
+		net.InvalidRequestMethod(w)		
 		return
 	}
 
@@ -24,6 +24,6 @@ func DeleteAllUsers(w http.ResponseWriter, r *http.Request) {
 	coll = db.Collection(client, "locations")
 	coll.DeleteMany(ctx, bson.D{})
 
-	net.MessageResponse(w, "success", 200)
+	net.Success(w)
 
 }

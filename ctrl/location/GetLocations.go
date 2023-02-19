@@ -27,7 +27,7 @@ func GetLocations(w http.ResponseWriter, r *http.Request) {
 	filter := bson.D{{Key: "user", Value: user.ID}}
 	cursor, err := coll.Find(ctx, filter)
 	if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
 		return
 	}
 	defer cursor.Close(ctx)
@@ -36,7 +36,7 @@ func GetLocations(w http.ResponseWriter, r *http.Request) {
 	for cursor.Next(ctx) {
 		var location model.LocationResponse
 		if err := cursor.Decode(&location); err != nil {
-			net.ServerError(w)
+			net.ServerError(w, err)
 			return
 		}
 		locations = append(locations, location)
@@ -49,7 +49,7 @@ func GetLocations(w http.ResponseWriter, r *http.Request) {
 
 	jsonData, err := json.Marshal(httpResponse)
 	if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
 		return
 	}
 	

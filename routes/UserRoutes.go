@@ -29,6 +29,11 @@ func UserRoutes() {
 		mid.CORS(
 		mid.Preflight(
 		mid.Auth(ctrl.LogoutUser))))
+
+	http.HandleFunc("/user/update",
+		mid.CORS(
+		mid.Preflight(
+		mid.Auth(ctrl.UpdateUser))))
 	
 
 }

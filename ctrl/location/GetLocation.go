@@ -24,7 +24,7 @@ func GetLocation(w http.ResponseWriter, r *http.Request) {
 	id := parts[len(parts)-1]
 	locationID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
 		return
 	}
 
@@ -42,7 +42,7 @@ func GetLocation(w http.ResponseWriter, r *http.Request) {
 		net.ResourceNotFound(w)
 		return
 	} else if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
 		return
 	}
 
@@ -58,7 +58,7 @@ func GetLocation(w http.ResponseWriter, r *http.Request) {
 
 	jsonData, err := json.Marshal(httpResponse)
 	if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
 		return
 	}
 	

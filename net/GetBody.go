@@ -5,10 +5,10 @@ import (
 	"net/http"
 )
 
-func GetBody(w http.ResponseWriter, r *http.Request) (body []byte) {
-	body, err := io.ReadAll(r.Body)
+func GetBody(w http.ResponseWriter, r *http.Request) (body []byte, err error) {
+	body, err = io.ReadAll(r.Body)
 	if err != nil {
-		ServerError(w)
+		return nil, err
 	}
-	return body
+	return body, nil
 }

@@ -6,7 +6,6 @@ import (
 	"github.com/phillip-england/go-http/routes"
 )
 
-
 func main() {
 	godotenv.Load()
 	routes.Mount()

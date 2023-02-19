@@ -11,7 +11,7 @@ import (
 func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "GET" {
-		net.MessageResponse(w, "invalid request method", http.StatusBadRequest)
+		net.InvalidRequestMethod(w)
 		return
 	}
 
@@ -30,7 +30,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	jsonData, err := json.Marshal(httpResponse)
 	if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
 		return
 	}
 

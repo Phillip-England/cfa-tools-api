@@ -2,7 +2,6 @@ package ctrl
 
 import (
 	"encoding/json"
-	"log"
 	"net/http"
 	"strings"
 
@@ -22,11 +21,16 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body := net.GetBody(w, r)
-	var user model.User
-	err := json.Unmarshal(body, &user)
+	body, err := net.GetBody(w, r)
 	if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
+		return
+	}
+
+	var user model.User
+	err = json.Unmarshal(body, &user)
+	if err != nil {
+		net.ServerError(w, err)
 		return
 	}
 
@@ -34,8 +38,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	user.Email = strings.ToLower(user.Email)
 	encryptedPassword, err := lib.Encrypt([]byte(user.Password))
 	if err != nil {
-		log.Println(err)
-		net.ServerError(w)
+		net.ServerError(w, err)
 		return
 	}
 	user.Password = string(encryptedPassword)
@@ -52,20 +55,20 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err != mongo.ErrNoDocuments && err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
 		return
 	}
 
 	res, err := coll.InsertOne(ctx, user)
 	if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
 		return
 	}
 	id := res.InsertedID.(primitive.ObjectID)
 
 	signedString, err := lib.GetJWT(id.Hex())
 	if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
 		return
 	}
 

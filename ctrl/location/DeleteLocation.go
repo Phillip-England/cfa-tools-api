@@ -39,7 +39,7 @@ func DeleteLocation(w http.ResponseWriter, r *http.Request) {
 		net.ResourceNotFound(w)
 		return
 	} else if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
 		return
 	}
 
@@ -50,7 +50,7 @@ func DeleteLocation(w http.ResponseWriter, r *http.Request) {
 
 	_, err = coll.DeleteOne(ctx, filter)
 	if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
 		return
 	}
 

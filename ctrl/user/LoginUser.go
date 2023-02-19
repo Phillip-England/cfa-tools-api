@@ -20,11 +20,16 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	body := net.GetBody(w, r)
-	var user model.User
-	err := json.Unmarshal(body, &user)
+	body, err := net.GetBody(w, r)
 	if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
+		return
+	}
+
+	var user model.User
+	err = json.Unmarshal(body, &user)
+	if err != nil {
+		net.ServerError(w, err)
 		return
 	}
 	user.Email = strings.ToLower(user.Email)
@@ -44,7 +49,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	decryptedPasswordBytes, err := lib.Decrypt([]byte(userExists.Password))
 	if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
 		return
 	}
 
@@ -55,7 +60,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	signedString, err := lib.GetJWT(userExists.ID.Hex())
 	if err != nil {
-		net.ServerError(w)
+		net.ServerError(w, err)
 		return
 	}
 
