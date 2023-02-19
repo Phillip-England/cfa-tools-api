@@ -1,6 +1,7 @@
 package ctrl
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -22,12 +23,20 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	type requestBody struct {
 		CurrentPassword string `json:"current_password"`
 		NewPassword string `json:"new_password"`
+		CSRF string `json:"_csrf"`
 	}
 
 	body := requestBody{}
 	err := net.GetBody(w, r, &body)
 	if err != nil {
 		res.ServerError(w, err)
+		return
+	}
+
+	err = net.IsCSRF(body.CSRF)
+	if err != nil {
+		log.Println(err)
+		res.Forbidden(w)
 		return
 	}
 	
