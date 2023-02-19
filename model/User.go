@@ -21,7 +21,6 @@ type UserResponse struct {
 	Email     string `json:"email" bson:"email"`
 }
 
-
 func BuildUser(email string, password string) (user User, err error) {
 	encryptedPassword, err := lib.Encrypt([]byte(password))
 	email = strings.ToLower(email)
@@ -42,4 +41,13 @@ func (user *User) Timestamp() {
 		user.CreatedAt = now
 	}
 	user.UpdatedAt = now
+}
+
+func (user *User) GetDecryptedPassword() (password string, err error) {
+	passwordBytes, err := lib.Decrypt([]byte(user.Password))
+	if err != nil {
+		return "", err
+	}
+	password = string(passwordBytes)
+	return password, nil
 }

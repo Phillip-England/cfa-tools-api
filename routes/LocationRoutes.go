@@ -29,4 +29,9 @@ func LocationRoutes() {
 		mid.Preflight(
 		mid.Auth(ctrl.DeleteLocation))))
 
+		http.HandleFunc("/location/update/",
+			mid.CORS(
+			mid.Preflight(
+			mid.Auth(ctrl.UpdateLocation))))
+
 }

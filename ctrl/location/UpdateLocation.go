@@ -1,9 +1,8 @@
 package ctrl
 
 import (
-	"encoding/json"
 	"net/http"
-	"strings"
+	"time"
 
 	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/model"
@@ -13,15 +12,22 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetLocation(w http.ResponseWriter, r *http.Request) {
+func UpdateLocation(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method != "GET" {
-		net.MessageResponse(w, "invalid request method", 400)
+	if r.Method != "PUT" {
+		net.InvalidRequestMethod(w)
 		return
 	}
 
-	parts := strings.Split(r.URL.Path, "/")
-	id := parts[len(parts)-1]
+	type requestBody struct {
+		Name string `json:"name"`
+		Number string `json:"number"`
+	}
+
+	body := requestBody{}
+	net.GetBody(w, r, &body)
+
+	id := net.GetURLParam(r.URL.Path)
 	locationID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		net.ResourceNotFound(w)
@@ -35,8 +41,8 @@ func GetLocation(w http.ResponseWriter, r *http.Request) {
 	defer disconnect()
 	coll := db.Collection(client, "locations")
 
+	location := model.Location{}
 	filter := bson.D{{Key: "_id", Value: locationID}}
-	var location model.LocationResponse
 	err = coll.FindOne(ctx, filter).Decode(&location)
 	if err == mongo.ErrNoDocuments {
 		net.ResourceNotFound(w)
@@ -51,18 +57,21 @@ func GetLocation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	httpResponse := model.HttpResponse{
-		Message: "success",
-		Data: location,
-	}
-
-	jsonData, err := json.Marshal(httpResponse)
+	filter = bson.D{{
+		Key:"$set", Value: bson.D{
+			{Key: "name", Value: body.Name},
+			{Key: "number", Value: body.Number},
+			{Key: "updated_at", Value: time.Now()},
+		},
+	}}
+	_, err = coll.UpdateByID(ctx, location.ID, filter)
 	if err != nil {
 		net.ServerError(w, err)
 		return
 	}
-	
-	w.WriteHeader(200)
-	w.Write(jsonData)
+
+	net.Success(w)
+
+
 
 }

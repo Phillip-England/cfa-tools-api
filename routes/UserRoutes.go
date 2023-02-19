@@ -33,7 +33,7 @@ func UserRoutes() {
 	http.HandleFunc("/user/update/password",
 		mid.CORS(
 		mid.Preflight(
-		mid.Auth(ctrl.UpdateUser))))
+		mid.Auth(ctrl.UpdateUserPassword))))
 	
 
 }
