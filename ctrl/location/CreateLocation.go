@@ -6,12 +6,13 @@ import (
 	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/net"
+	"github.com/phillip-england/go-http/res"
 )
 
 func CreateLocation(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
-		net.InvalidRequestMethod(w)
+		res.InvalidRequestMethod(w)
 		return
 	}
 	
@@ -23,7 +24,7 @@ func CreateLocation(w http.ResponseWriter, r *http.Request) {
 	body := requestBody{}
 	err := net.GetBody(w, r, &body)
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 	
@@ -32,7 +33,7 @@ func CreateLocation(w http.ResponseWriter, r *http.Request) {
 
 	location, err := model.BuildLocation(user.ID, body.Name, body.Number)
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 
@@ -42,9 +43,9 @@ func CreateLocation(w http.ResponseWriter, r *http.Request) {
 
 	_, err = coll.InsertOne(ctx, location)
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 
-	net.Success(w)
+	res.Success(w)
 }

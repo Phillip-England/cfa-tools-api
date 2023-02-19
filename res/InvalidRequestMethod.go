@@ -1,4 +1,4 @@
-package net
+package res
 
 import (
 	"encoding/json"
@@ -7,11 +7,11 @@ import (
 	"github.com/phillip-england/go-http/model"
 )
 
-func BadReqeust(w http.ResponseWriter, message string) {
-	response := model.SimpleResponse{Message: message}
+func InvalidRequestMethod(w http.ResponseWriter) {
+	response := model.SimpleResponse{Message: "invalid request method"}
 	jsonBytes, err := json.Marshal(response)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusForbidden)
+		http.Error(w, err.Error(), 400)
 	}
 	w.WriteHeader(400)
 	w.Write(jsonBytes)

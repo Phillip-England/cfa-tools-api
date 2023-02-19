@@ -7,6 +7,7 @@ import (
 	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/net"
+	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,7 +16,7 @@ import (
 func UpdateLocation(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "PUT" {
-		net.InvalidRequestMethod(w)
+		res.InvalidRequestMethod(w)
 		return
 	}
 
@@ -30,7 +31,7 @@ func UpdateLocation(w http.ResponseWriter, r *http.Request) {
 	id := net.GetURLParam(r.URL.Path)
 	locationID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		net.ResourceNotFound(w)
+		res.ResourceNotFound(w)
 		return
 	}
 
@@ -45,15 +46,15 @@ func UpdateLocation(w http.ResponseWriter, r *http.Request) {
 	filter := bson.D{{Key: "_id", Value: locationID}}
 	err = coll.FindOne(ctx, filter).Decode(&location)
 	if err == mongo.ErrNoDocuments {
-		net.ResourceNotFound(w)
+		res.ResourceNotFound(w)
 		return
 	} else if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 
 	if location.User != user.ID {
-		net.Forbidden(w)
+		res.Forbidden(w)
 		return
 	}
 
@@ -66,11 +67,11 @@ func UpdateLocation(w http.ResponseWriter, r *http.Request) {
 	}}
 	_, err = coll.UpdateByID(ctx, location.ID, filter)
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 
-	net.Success(w)
+	res.Success(w)
 
 
 

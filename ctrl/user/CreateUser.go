@@ -7,6 +7,7 @@ import (
 	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/net"
+	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -15,7 +16,7 @@ import (
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
-		net.MessageResponse(w, "invalid request method", http.StatusBadRequest)
+		res.MessageResponse(w, "invalid request method", http.StatusBadRequest)
 		return
 	}
 
@@ -27,13 +28,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	body := requestBody{}
 	err := net.GetBody(w, r, &body)
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 
 	user, err := model.BuildUser(body.Email, body.Password)
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 	}
 	
 	ctx, client, disconnect := db.Connect()
@@ -44,29 +45,29 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	filter := bson.D{{Key: "email", Value: user.Email}}
 	err = coll.FindOne(ctx, filter).Decode(&userExists)
 	if userExists.Email == user.Email && err != mongo.ErrNoDocuments {
-		net.MessageResponse(w, "user already exists", 400)
+		res.MessageResponse(w, "user already exists", 400)
 		return
 	}
 	if err != mongo.ErrNoDocuments && err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 
-	res, err := coll.InsertOne(ctx, user)
+	result, err := coll.InsertOne(ctx, user)
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
-	id := res.InsertedID.(primitive.ObjectID)
+	id := result.InsertedID.(primitive.ObjectID)
 
 	signedString, err := lib.GetJWT(id.Hex())
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 
 	net.HttpCookie(w, "token", signedString, 30)
 	
-	net.Success(w)
+	res.Success(w)
 
 }

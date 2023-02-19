@@ -5,13 +5,13 @@ import (
 	"net/http"
 
 	"github.com/phillip-england/go-http/model"
-	"github.com/phillip-england/go-http/net"
+	"github.com/phillip-england/go-http/res"
 )
 
 func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "GET" {
-		net.InvalidRequestMethod(w)
+		res.InvalidRequestMethod(w)
 		return
 	}
 
@@ -30,7 +30,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	jsonData, err := json.Marshal(httpResponse)
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 

@@ -8,6 +8,7 @@ import (
 	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/net"
+	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -18,7 +19,7 @@ import (
 func LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
-		net.MessageResponse(w, "invalid request method", 400)
+		res.MessageResponse(w, "invalid request method", 400)
 		return
 	}
 
@@ -30,7 +31,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	body := requestBody{}
 	err := net.GetBody(w, r, &body)
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 
@@ -45,32 +46,32 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	err = coll.FindOne(ctx, filter).Decode(&userExists)
 
 	if err == mongo.ErrNoDocuments {
-		net.MessageResponse(w, "invalid credentials", 400)
+		res.BadReqeust(w, "invalid credentials")
 		return
 	} else if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 
 	decryptedPasswordBytes, err := lib.Decrypt([]byte(userExists.Password))
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 
 	if body.Password != string(decryptedPasswordBytes) {
-		net.MessageResponse(w, "invalid credentials", 400)
+		res.BadReqeust(w, "invalid credentials")
 		return
 	}
 
 	signedString, err := lib.GetJWT(userExists.ID.Hex())
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 
 	net.HttpCookie(w, "token", signedString, 30)
 
-	net.MessageResponse(w, "success", 200)
+	res.MessageResponse(w, "success", 200)
 
 }

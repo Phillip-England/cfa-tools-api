@@ -8,13 +8,14 @@ import (
 	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/net"
+	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	
 	if r.Method != "PUT" {
-		net.InvalidRequestMethod(w)
+		res.InvalidRequestMethod(w)
 		return
 	}
 	
@@ -26,7 +27,7 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	body := requestBody{}
 	err := net.GetBody(w, r, &body)
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 	
@@ -35,18 +36,18 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 
 	password, err := user.GetDecryptedPassword()
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 
 	if body.CurrentPassword != string(password) {
-		net.BadReqeust(w, "current password invalid")
+		res.BadReqeust(w, "current password invalid")
 		return
 	}
 
 	encryptedPassword, err := lib.Encrypt([]byte(body.NewPassword))
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 
@@ -62,10 +63,10 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	}}
 	_, err = coll.UpdateByID(ctx, user.ID, filter)
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 
-	net.Success(w)
+	res.Success(w)
 
 }

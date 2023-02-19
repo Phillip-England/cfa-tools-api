@@ -7,7 +7,7 @@ import (
 
 	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/model"
-	"github.com/phillip-england/go-http/net"
+	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -16,7 +16,7 @@ import (
 func GetLocation(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "GET" {
-		net.MessageResponse(w, "invalid request method", 400)
+		res.MessageResponse(w, "invalid request method", 400)
 		return
 	}
 
@@ -24,7 +24,7 @@ func GetLocation(w http.ResponseWriter, r *http.Request) {
 	id := parts[len(parts)-1]
 	locationID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
-		net.ResourceNotFound(w)
+		res.ResourceNotFound(w)
 		return
 	}
 
@@ -39,15 +39,15 @@ func GetLocation(w http.ResponseWriter, r *http.Request) {
 	var location model.LocationResponse
 	err = coll.FindOne(ctx, filter).Decode(&location)
 	if err == mongo.ErrNoDocuments {
-		net.ResourceNotFound(w)
+		res.ResourceNotFound(w)
 		return
 	} else if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 
 	if location.User != user.ID {
-		net.Forbidden(w)
+		res.Forbidden(w)
 		return
 	}
 
@@ -58,7 +58,7 @@ func GetLocation(w http.ResponseWriter, r *http.Request) {
 
 	jsonData, err := json.Marshal(httpResponse)
 	if err != nil {
-		net.ServerError(w, err)
+		res.ServerError(w, err)
 		return
 	}
 	

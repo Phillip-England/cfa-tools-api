@@ -4,14 +4,14 @@ import (
 	"net/http"
 
 	"github.com/phillip-england/go-http/db"
-	"github.com/phillip-england/go-http/net"
+	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
 func DeleteAllUsers(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "DELETE" {
-		net.InvalidRequestMethod(w)		
+		res.InvalidRequestMethod(w)		
 		return
 	}
 
@@ -24,6 +24,6 @@ func DeleteAllUsers(w http.ResponseWriter, r *http.Request) {
 	coll = db.Collection(client, "locations")
 	coll.DeleteMany(ctx, bson.D{})
 
-	net.Success(w)
+	res.Success(w)
 
 }
