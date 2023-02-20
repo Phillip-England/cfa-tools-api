@@ -15,7 +15,7 @@ func Encrypt(value []byte) (ciphertext []byte, err error) {
 
 	// creating a new cipher
 	block, err := aes.NewCipher(key)
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 
@@ -23,7 +23,7 @@ func Encrypt(value []byte) (ciphertext []byte, err error) {
 	ciphertext = make([]byte, aes.BlockSize+len(value))
 	iv := ciphertext[:aes.BlockSize]
 	_, err = io.ReadFull(rand.Reader, iv)
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 
@@ -31,6 +31,5 @@ func Encrypt(value []byte) (ciphertext []byte, err error) {
 	stream := cipher.NewCFBEncrypter(block, iv)
 	stream.XORKeyStream(ciphertext[aes.BlockSize:], value)
 	return ciphertext, nil
-
 
 }

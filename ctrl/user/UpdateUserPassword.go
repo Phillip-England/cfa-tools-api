@@ -14,16 +14,16 @@ import (
 )
 
 func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
-	
+
 	if r.Method != "PUT" {
 		res.InvalidRequestMethod(w)
 		return
 	}
-	
+
 	type requestBody struct {
-		CurrentPassword string `json:"current_password"`
-		NewPassword string `json:"new_password"`
-		CSRF string `json:"_csrf"`
+		CurrentPassword string `json:"currentPassword"`
+		NewPassword     string `json:"newPassword"`
+		CSRF            string `json:"_csrf"`
 	}
 
 	body := requestBody{}
@@ -39,7 +39,7 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 		res.Forbidden(w)
 		return
 	}
-	
+
 	const userKey model.ContextKey = "user"
 	user := r.Context().Value(userKey).(model.User)
 
@@ -65,7 +65,7 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	coll := db.Collection(client, "users")
 
 	filter := bson.D{{
-		Key:"$set", Value: bson.D{
+		Key: "$set", Value: bson.D{
 			{Key: "password", Value: string(encryptedPassword)},
 			{Key: "updated_at", Value: time.Now()},
 		},

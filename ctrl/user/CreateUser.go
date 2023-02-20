@@ -21,7 +21,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type requestBody struct {
-		Email string `json:"email"`
+		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 
@@ -36,11 +36,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		res.ServerError(w, err)
 	}
-	
+
 	ctx, client, disconnect := db.Connect()
 	defer disconnect()
 	coll := db.Collection(client, "users")
-	
+
 	var userExists model.User
 	filter := bson.D{{Key: "email", Value: user.Email}}
 	err = coll.FindOne(ctx, filter).Decode(&userExists)
@@ -67,7 +67,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	net.HttpCookie(w, "token", signedString, 30)
-	
+
 	res.Success(w)
 
 }

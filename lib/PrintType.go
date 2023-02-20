@@ -8,7 +8,7 @@ import (
 func PrintType(v interface{}) {
 	vValue := reflect.ValueOf(v)
 	vType := vValue.Type()
-		for i := 0; i < vType.NumField(); i++ {
+	for i := 0; i < vType.NumField(); i++ {
 		field := vType.Field(i)
 		fieldValue := vValue.Field(i)
 		fmt.Printf("%s: %v\n", field.Name, fieldValue.Interface())

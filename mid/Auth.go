@@ -117,11 +117,6 @@ func Auth(next http.HandlerFunc) http.HandlerFunc {
 			ctx = context.WithValue(r.Context(), userKey, user)
 			next.ServeHTTP(w, r.WithContext(ctx))
 		}
-		
-
-
-
-		
 
 	}
 }

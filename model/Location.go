@@ -8,24 +8,24 @@ import (
 
 type Location struct {
 	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
-	User 			primitive.ObjectID `json:"user,omitempty" bson:"user,omitempty"`
-	CreatedAt time.Time `json:"created_at" bson:"created_at"`
-	UpdatedAt time.Time `json:"updated_at" bson:"updated_at"`
-	Name     string `json:"name" bson:"name"`
-	Number  string `json:"number" bson:"number"`
+	User      primitive.ObjectID `json:"user,omitempty" bson:"user,omitempty"`
+	CreatedAt time.Time          `json:"createdAt" bson:"createdAt"`
+	UpdatedAt time.Time          `json:"updatedAt" bson:"updatedAt"`
+	Name      string             `json:"name" bson:"name"`
+	Number    string             `json:"number" bson:"number"`
 }
 
 type LocationResponse struct {
-	ID        primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
-	User 			primitive.ObjectID `json:"user,omitempty" bson:"user,omitempty"`
-	Name     string `json:"name" bson:"name"`
-	Number  string `json:"number" bson:"number"`
+	ID     primitive.ObjectID `json:"_id,omitempty" bson:"_id,omitempty"`
+	User   primitive.ObjectID `json:"user,omitempty" bson:"user,omitempty"`
+	Name   string             `json:"name" bson:"name"`
+	Number string             `json:"number" bson:"number"`
 }
 
 func BuildLocation(userID primitive.ObjectID, name string, number string) (location Location, err error) {
 	location = Location{
-		User: userID,
-		Name: name,
+		User:   userID,
+		Name:   name,
 		Number: number,
 	}
 	location.Timestamp()

@@ -10,15 +10,15 @@ import (
 
 func ServerError(w http.ResponseWriter, err error) {
 
-
 	if os.Getenv("GO_ENV") == "prod" {
 		response := model.ErrorResponse{
 			Message: "internal server error",
-			Error: err.Error(),
+			Error:   err.Error(),
 		}
 		jsonBytes, err := json.Marshal(response)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(jsonBytes)
@@ -27,6 +27,7 @@ func ServerError(w http.ResponseWriter, err error) {
 		jsonBytes, err := json.Marshal(response)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
 		}
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write(jsonBytes)

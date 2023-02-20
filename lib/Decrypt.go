@@ -12,11 +12,11 @@ func Decrypt(ciphertext []byte) (value []byte, err error) {
 	var key []byte = []byte(os.Getenv("CRYPTO_KEY"))
 
 	block, err := aes.NewCipher(key)
-	if (err != nil) {
+	if err != nil {
 		return nil, err
 	}
 
-	if (len(ciphertext) < aes.BlockSize) {
+	if len(ciphertext) < aes.BlockSize {
 		return nil, fmt.Errorf("ciphertext is too short")
 	}
 

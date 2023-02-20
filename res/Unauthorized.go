@@ -12,6 +12,7 @@ func Unauthorized(w http.ResponseWriter) {
 	jsonBytes, err := json.Marshal(response)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 	w.WriteHeader(401)
 	w.Write(jsonBytes)

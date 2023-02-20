@@ -9,12 +9,12 @@ func HttpCookie(w http.ResponseWriter, name string, value string, expireMinutes 
 	minutes := time.Duration(expireMinutes)
 	expire := time.Now().Add(minutes * time.Minute)
 	cookie := http.Cookie{
-		Name: name,
-		Value: value,
-		Expires: expire,
+		Name:     name,
+		Value:    value,
+		Expires:  expire,
 		HttpOnly: true,
-		Secure: false,
-		Path: "/",
+		Secure:   false,
+		Path:     "/",
 	}
 	http.SetCookie(w, &cookie)
 }

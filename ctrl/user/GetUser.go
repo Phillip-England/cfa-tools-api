@@ -20,7 +20,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 	user := r.Context().Value(userKey).(model.User)
 
 	userResponse := model.UserResponse{
-		ID: user.ID,
+		ID:    user.ID,
 		Email: user.Email,
 	}
 
@@ -32,8 +32,8 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 
 	httpResponse := model.HttpResponse{
 		Message: "success",
-		Data: userResponse,
-		CSRF: token,
+		Data:    userResponse,
+		CSRF:    token,
 	}
 
 	jsonData, err := json.Marshal(httpResponse)

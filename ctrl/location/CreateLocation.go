@@ -15,19 +15,26 @@ func CreateLocation(w http.ResponseWriter, r *http.Request) {
 		res.InvalidRequestMethod(w)
 		return
 	}
-	
+
 	type requestBody struct {
-		Name string `json:"name"`
+		Name   string `json:"name"`
 		Number string `json:"number"`
+		CSRF   string `json:"_csrf"`
 	}
-	
+
 	body := requestBody{}
 	err := net.GetBody(w, r, &body)
 	if err != nil {
 		res.ServerError(w, err)
 		return
 	}
-	
+
+	err = net.IsCSRF(body.CSRF)
+	if err != nil {
+		res.Forbidden(w)
+		return
+	}
+
 	const userKey model.ContextKey = "user"
 	user := r.Context().Value(userKey).(model.User)
 

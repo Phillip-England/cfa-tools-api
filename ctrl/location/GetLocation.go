@@ -53,7 +53,7 @@ func GetLocation(w http.ResponseWriter, r *http.Request) {
 
 	httpResponse := model.HttpResponse{
 		Message: "success",
-		Data: location,
+		Data:    location,
 	}
 
 	jsonData, err := json.Marshal(httpResponse)
@@ -61,7 +61,7 @@ func GetLocation(w http.ResponseWriter, r *http.Request) {
 		res.ServerError(w, err)
 		return
 	}
-	
+
 	w.WriteHeader(200)
 	w.Write(jsonData)
 

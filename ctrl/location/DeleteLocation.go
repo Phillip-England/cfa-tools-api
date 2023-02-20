@@ -25,14 +25,14 @@ func DeleteLocation(w http.ResponseWriter, r *http.Request) {
 		res.ResourceNotFound(w)
 		return
 	}
-	
+
 	const userKey model.ContextKey = "user"
 	user := r.Context().Value(userKey).(model.User)
 
 	ctx, client, disconnect := db.Connect()
 	defer disconnect()
 	coll := db.Collection(client, "locations")
-	
+
 	var location model.Location
 	filter := bson.D{{Key: "_id", Value: locationID}}
 	err = coll.FindOne(ctx, filter).Decode(&location)

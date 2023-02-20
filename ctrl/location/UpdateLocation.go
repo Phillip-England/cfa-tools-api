@@ -21,8 +21,9 @@ func UpdateLocation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type requestBody struct {
-		Name string `json:"name"`
+		Name   string `json:"name"`
 		Number string `json:"number"`
+		CSRF   string `json:"_csrf"`
 	}
 
 	body := requestBody{}
@@ -32,6 +33,12 @@ func UpdateLocation(w http.ResponseWriter, r *http.Request) {
 	locationID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		res.ResourceNotFound(w)
+		return
+	}
+
+	err = net.IsCSRF(body.CSRF)
+	if err != nil {
+		res.Forbidden(w)
 		return
 	}
 
@@ -59,7 +66,7 @@ func UpdateLocation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filter = bson.D{{
-		Key:"$set", Value: bson.D{
+		Key: "$set", Value: bson.D{
 			{Key: "name", Value: body.Name},
 			{Key: "number", Value: body.Number},
 			{Key: "updated_at", Value: time.Now()},
@@ -72,7 +79,5 @@ func UpdateLocation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	res.Success(w)
-
-
 
 }

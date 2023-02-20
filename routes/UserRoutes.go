@@ -9,31 +9,30 @@ import (
 
 func UserRoutes() {
 
-	http.HandleFunc("/user/create", 
+	http.HandleFunc("/user/create",
 		mid.CORS(
-		mid.Preflight(ctrl.CreateUser)))
+			mid.Preflight(ctrl.CreateUser)))
 
-	http.HandleFunc("/user/login", 
+	http.HandleFunc("/user/login",
 		mid.CORS(
-		mid.Preflight(ctrl.LoginUser)))
+			mid.Preflight(ctrl.LoginUser)))
 
-	http.HandleFunc("/user/deleteall", 
+	http.HandleFunc("/user/deleteall",
 		mid.CORS(ctrl.DeleteAllUsers))
 
 	http.HandleFunc("/user/get",
 		mid.CORS(
-		mid.Preflight(
-		mid.Auth(ctrl.GetUser))))	
+			mid.Preflight(
+				mid.Auth(ctrl.GetUser))))
 
 	http.HandleFunc("/user/logout",
 		mid.CORS(
-		mid.Preflight(
-		mid.Auth(ctrl.LogoutUser))))
+			mid.Preflight(
+				mid.Auth(ctrl.LogoutUser))))
 
 	http.HandleFunc("/user/update/password",
 		mid.CORS(
-		mid.Preflight(
-		mid.Auth(ctrl.UpdateUserPassword))))
-	
+			mid.Preflight(
+				mid.Auth(ctrl.UpdateUserPassword))))
 
 }

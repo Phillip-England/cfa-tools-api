@@ -8,22 +8,21 @@ import (
 )
 
 type CustomClaims struct {
-	Claims jwt.RegisteredClaims;
+	Claims jwt.RegisteredClaims
 }
-
 
 func GetJWT(data string) (signedString string, err error) {
 
 	key := []byte(os.Getenv("JWT_KEY"))
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"exp": jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
-		"iss": "cfa-tools",
+		"exp":  jwt.NewNumericDate(time.Now().Add(24 * time.Hour)),
+		"iss":  "cfa-tools",
 		"data": data,
 	})
 
 	signedString, err = token.SignedString(key)
-	if (err != nil) {
+	if err != nil {
 		return "", err
 	}
 

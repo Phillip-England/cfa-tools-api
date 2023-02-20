@@ -13,9 +13,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-
-
-
 func LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
@@ -24,7 +21,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type requestBody struct {
-		Email string `json:"email"`
+		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
 

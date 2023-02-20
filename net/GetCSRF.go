@@ -5,7 +5,6 @@ import (
 	"encoding/base64"
 )
 
-
 func GetCSRF() (token string, err error) {
 
 	length := 64

@@ -11,7 +11,7 @@ import (
 func DeleteAllUsers(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "DELETE" {
-		res.InvalidRequestMethod(w)		
+		res.InvalidRequestMethod(w)
 		return
 	}
 

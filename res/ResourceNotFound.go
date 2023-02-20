@@ -11,8 +11,9 @@ func ResourceNotFound(w http.ResponseWriter) {
 	response := model.SimpleResponse{Message: "resource not found"}
 	jsonBytes, err := json.Marshal(response)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusForbidden)
+		http.Error(w, err.Error(), 500)
+		return
 	}
-	w.WriteHeader(400)
+	w.WriteHeader(404)
 	w.Write(jsonBytes)
 }
