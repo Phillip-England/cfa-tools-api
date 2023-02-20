@@ -9,7 +9,7 @@ import (
 
 func CaresRoutes() {
 
-	http.HandleFunc("/team-member/create",
+	http.HandleFunc("/cares/create",
 		mid.CORS(
 			mid.Preflight(
 				mid.Auth(ctrl.CreateCares))))

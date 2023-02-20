@@ -15,6 +15,7 @@ func CreateCares(w http.ResponseWriter, r *http.Request) {
 	}
 
 	type requestBody struct {
+		LocationID        string `json:"locationID"`
 		GuestName         string `json:"guestName"`
 		OrderNumber       string `json:"orderNumber"`
 		Incident          string `json:"incident"`
