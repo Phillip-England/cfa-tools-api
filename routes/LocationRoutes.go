@@ -40,13 +40,13 @@ func LocationRoutes() {
 				mid.Auth(ctrl.SelectLocation))))
 
 	http.HandleFunc("/location/get/active",
-	mid.CORS(
-		mid.Preflight(
-			mid.Auth(ctrl.GetActiveLocation))))
+		mid.CORS(
+			mid.Preflight(
+				mid.Auth(ctrl.GetActiveLocation))))
 
 	http.HandleFunc("/location/drop/active",
-	mid.CORS(
-		mid.Preflight(
-			mid.Auth(ctrl.DropActiveLocation))))
+		mid.CORS(
+			mid.Preflight(
+				mid.Auth(ctrl.DropActiveLocation))))
 
 }
