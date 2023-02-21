@@ -4,4 +4,5 @@ func Mount() {
 	UserRoutes()
 	LocationRoutes()
 	CaresRoutes()
+	GuestRoutes()
 }

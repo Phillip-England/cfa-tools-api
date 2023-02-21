@@ -8,6 +8,7 @@ import (
 
 func main() {
 	godotenv.Load()
+	net.ServerStaticFiles()
 	routes.Mount()
-	net.Serve()
+	net.RunServer()
 }
