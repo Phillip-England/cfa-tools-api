@@ -3,7 +3,6 @@ package ctrl
 import (
 	"encoding/json"
 	"net/http"
-	"strings"
 
 	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/model"
@@ -13,23 +12,27 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetLocation(w http.ResponseWriter, r *http.Request) {
+func GetActiveLocation(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "GET" {
 		res.InvalidRequestMethod(w)
 		return
 	}
 
-	parts := strings.Split(r.URL.Path, "/")
-	id := parts[len(parts)-1]
-	locationID, err := primitive.ObjectIDFromHex(id)
+	const userKey model.ContextKey = "user"
+	user := r.Context().Value(userKey).(model.User)
+
+	cookie, err := r.Cookie("location")
 	if err != nil {
-		res.ResourceNotFound(w)
+		res.BadReqeust(w, "no active location")
 		return
 	}
 
-	const userKey model.ContextKey = "user"
-	user := r.Context().Value(userKey).(model.User)
+	locationID, err := primitive.ObjectIDFromHex(cookie.Value)
+	if err != nil {
+		res.ServerError(w, err)
+		return
+	}
 
 	ctx, client, disconnect := db.Connect()
 	defer disconnect()

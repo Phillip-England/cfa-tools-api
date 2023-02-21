@@ -1,19 +1,19 @@
 package ctrl
 
 import (
-	"encoding/json"
 	"net/http"
 	"strings"
 
 	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/model"
+	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetLocation(w http.ResponseWriter, r *http.Request) {
+func SelectLocation(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "GET" {
 		res.InvalidRequestMethod(w)
@@ -51,18 +51,8 @@ func GetLocation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	httpResponse := model.HttpResponse{
-		Message: "success",
-		Data:    location,
-	}
+	net.HttpCookie(w, "location", id, 1440)
 
-	jsonData, err := json.Marshal(httpResponse)
-	if err != nil {
-		res.ServerError(w, err)
-		return
-	}
-
-	w.WriteHeader(200)
-	w.Write(jsonData)
+	res.Success(w)
 
 }

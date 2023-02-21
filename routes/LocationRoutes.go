@@ -34,4 +34,19 @@ func LocationRoutes() {
 			mid.Preflight(
 				mid.Auth(ctrl.UpdateLocation))))
 
+	http.HandleFunc("/location/select/",
+		mid.CORS(
+			mid.Preflight(
+				mid.Auth(ctrl.SelectLocation))))
+
+	http.HandleFunc("/location/get/active",
+	mid.CORS(
+		mid.Preflight(
+			mid.Auth(ctrl.GetActiveLocation))))
+
+	http.HandleFunc("/location/drop/active",
+	mid.CORS(
+		mid.Preflight(
+			mid.Auth(ctrl.DropActiveLocation))))
+
 }
