@@ -1,7 +1,6 @@
 package ctrl
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/phillip-england/go-http/db"
@@ -88,13 +87,11 @@ func CreateCares(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	doc, err := coll.InsertOne(ctx, cares)
+	_, err = coll.InsertOne(ctx, cares)
 	if err != nil {
 		res.ServerError(w, err)
 		return
 	}
-
-	log.Println(doc)
 
 	res.Success(w)
 

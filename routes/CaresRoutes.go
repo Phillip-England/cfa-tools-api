@@ -14,4 +14,9 @@ func CaresRoutes() {
 			mid.Preflight(
 				mid.Auth(ctrl.CreateCares))))
 
+	http.HandleFunc("/cares/delete/",
+		mid.CORS(
+			mid.Preflight(
+				mid.Auth(ctrl.DeleteCares))))
+
 }

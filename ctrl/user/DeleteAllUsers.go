@@ -24,6 +24,9 @@ func DeleteAllUsers(w http.ResponseWriter, r *http.Request) {
 	coll = db.Collection(client, "locations")
 	coll.DeleteMany(ctx, bson.D{})
 
+	coll = db.Collection(client, "cares")
+	coll.DeleteMany(ctx, bson.D{})
+
 	res.Success(w)
 
 }
