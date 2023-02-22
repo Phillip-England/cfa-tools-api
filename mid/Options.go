@@ -1,21 +1,21 @@
 package mid
 
-type MiddlewareOptions struct {
+type Options struct {
 	CORS      bool
 	Preflight bool
 	Auth      bool
 }
 
-func MidOptionsGuest() (options MiddlewareOptions) {
-	options = MiddlewareOptions{
+func MidOptionsGuest() (options Options) {
+	options = Options{
 		CORS:      true,
 		Preflight: true,
 	}
 	return options
 }
 
-func MidOptionsUser() (options MiddlewareOptions) {
-	options = MiddlewareOptions{
+func MidOptionsUser() (options Options) {
+	options = Options{
 		CORS:      true,
 		Preflight: true,
 		Auth:      true,

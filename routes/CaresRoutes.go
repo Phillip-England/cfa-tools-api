@@ -9,6 +9,8 @@ import (
 
 func CaresRoutes() {
 
+
+
 	http.HandleFunc("/cares/create",
 		mid.CORS(
 			mid.Preflight(
@@ -18,5 +20,7 @@ func CaresRoutes() {
 		mid.CORS(
 			mid.Preflight(
 				mid.Auth(ctrl.DeleteCares))))
+
+	mid.Handler("/cares/create", ctrl.CreateCares, mid.MidOptionsUser())
 
 }
