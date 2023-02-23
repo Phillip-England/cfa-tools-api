@@ -15,11 +15,6 @@ import (
 
 func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method != "PUT" {
-		res.InvalidRequestMethod(w)
-		return
-	}
-
 	type requestBody struct {
 		CurrentPassword string `json:"currentPassword"`
 		NewPassword     string `json:"newPassword"`

@@ -12,11 +12,6 @@ import (
 
 func DeleteCares(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method != "DELETE" {
-		res.InvalidRequestMethod(w)
-		return
-	}
-
 	id := net.GetURLParam(r.URL.Path)
 	caresID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {

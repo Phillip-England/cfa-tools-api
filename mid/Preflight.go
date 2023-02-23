@@ -7,13 +7,12 @@ import (
 	"github.com/phillip-england/go-http/res"
 )
 
-func Preflight(next http.HandlerFunc) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		isPreflight := net.IsPreflight(w, r)
-		if isPreflight {
+func Preflight(w http.ResponseWriter, r *http.Request) (response func()) {
+	isPreflight := net.IsPreflight(w, r)
+	if isPreflight {
+		return func() {
 			res.Success(w)
-		} else {
-			next(w, r)
 		}
 	}
+	return nil
 }

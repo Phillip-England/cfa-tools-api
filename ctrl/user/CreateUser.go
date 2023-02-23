@@ -15,11 +15,6 @@ import (
 
 func CreateUser(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method != "POST" {
-		res.MessageResponse(w, "invalid request method", http.StatusBadRequest)
-		return
-	}
-
 	type requestBody struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`

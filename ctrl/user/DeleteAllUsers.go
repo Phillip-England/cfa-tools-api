@@ -10,11 +10,6 @@ import (
 
 func DeleteAllUsers(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method != "DELETE" {
-		res.InvalidRequestMethod(w)
-		return
-	}
-
 	ctx, client, disconnect := db.Connect()
 	defer disconnect()
 

@@ -12,11 +12,6 @@ import (
 
 func GetLocations(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method != "GET" {
-		res.InvalidRequestMethod(w)
-		return
-	}
-
 	const userKey model.ContextKey = "user"
 	user := r.Context().Value(userKey).(model.User)
 

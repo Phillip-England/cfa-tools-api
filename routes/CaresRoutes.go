@@ -8,19 +8,6 @@ import (
 )
 
 func CaresRoutes() {
-
-
-
-	http.HandleFunc("/cares/create",
-		mid.CORS(
-			mid.Preflight(
-				mid.Auth(ctrl.CreateCares))))
-
-	http.HandleFunc("/cares/delete/",
-		mid.CORS(
-			mid.Preflight(
-				mid.Auth(ctrl.DeleteCares))))
-
-	mid.Handler("/cares/create", ctrl.CreateCares, mid.MidOptionsUser())
-
+	http.HandleFunc("/cares/delete/", mid.Handler("DELETE", ctrl.DeleteCares, mid.MidOptionsUser()))
+	http.HandleFunc("/cares/create", mid.Handler("POST", ctrl.CreateCares, mid.MidOptionsUser()))
 }

@@ -15,11 +15,6 @@ import (
 
 func SelectLocation(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method != "GET" {
-		res.InvalidRequestMethod(w)
-		return
-	}
-
 	parts := strings.Split(r.URL.Path, "/")
 	id := parts[len(parts)-1]
 	locationID, err := primitive.ObjectIDFromHex(id)

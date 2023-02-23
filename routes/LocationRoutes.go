@@ -8,45 +8,12 @@ import (
 )
 
 func LocationRoutes() {
-
-	http.HandleFunc("/location/create",
-		mid.CORS(
-			mid.Preflight(
-				mid.Auth(ctrl.CreateLocation))))
-
-	http.HandleFunc("/location/get",
-		mid.CORS(
-			mid.Preflight(
-				mid.Auth(ctrl.GetLocations))))
-
-	http.HandleFunc("/location/get/",
-		mid.CORS(
-			mid.Preflight(
-				mid.Auth(ctrl.GetLocation))))
-
-	http.HandleFunc("/location/delete/",
-		mid.CORS(
-			mid.Preflight(
-				mid.Auth(ctrl.DeleteLocation))))
-
-	http.HandleFunc("/location/update/",
-		mid.CORS(
-			mid.Preflight(
-				mid.Auth(ctrl.UpdateLocation))))
-
-	http.HandleFunc("/location/select/",
-		mid.CORS(
-			mid.Preflight(
-				mid.Auth(ctrl.SelectLocation))))
-
-	http.HandleFunc("/location/get/active",
-		mid.CORS(
-			mid.Preflight(
-				mid.Auth(ctrl.GetActiveLocation))))
-
-	http.HandleFunc("/location/drop/active",
-		mid.CORS(
-			mid.Preflight(
-				mid.Auth(ctrl.DropActiveLocation))))
-
+	http.HandleFunc("/location/create", mid.Handler("POST", ctrl.CreateLocation, mid.MidOptionsUser()))
+	http.HandleFunc("/location/get", mid.Handler("GET", ctrl.GetLocations, mid.MidOptionsUser()))
+	http.HandleFunc("/location/get/", mid.Handler("GET", ctrl.GetLocation, mid.MidOptionsUser()))
+	http.HandleFunc("/location/delete/", mid.Handler("DELETE", ctrl.DeleteLocation, mid.MidOptionsUser()))
+	http.HandleFunc("/location/update/", mid.Handler("PUT", ctrl.UpdateLocation, mid.MidOptionsUser()))
+	http.HandleFunc("/location/select/", mid.Handler("GET", ctrl.SelectLocation, mid.MidOptionsUser()))
+	http.HandleFunc("/location/get/active", mid.Handler("GET", ctrl.GetActiveLocation, mid.MidOptionsUser()))
+	http.HandleFunc("/location/drop/active", mid.Handler("GET", ctrl.DropActiveLocation, mid.MidOptionsUser()))
 }

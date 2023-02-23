@@ -15,11 +15,6 @@ import (
 
 func UpdateLocation(w http.ResponseWriter, r *http.Request) {
 
-	if r.Method != "PUT" {
-		res.InvalidRequestMethod(w)
-		return
-	}
-
 	type requestBody struct {
 		Name   string `json:"name"`
 		Number string `json:"number"`
