@@ -9,11 +9,40 @@ import (
 
 func UserRoutes() {
 
-	http.HandleFunc("/user/create", mid.Handler("POST", ctrl.CreateUser, mid.MidOptionsGuest()))
-	http.HandleFunc("/user/login", mid.Handler("POST", ctrl.LoginUser, mid.MidOptionsGuest()))
-	http.HandleFunc("/user/deleteall", mid.Handler("DELETE", ctrl.DeleteAllUsers, mid.MidOptionsGuest()))
-	http.HandleFunc("/user/get", mid.Handler("GET", ctrl.GetUser, mid.MidOptionsUser()))
-	http.HandleFunc("/user/logout", mid.Handler("GET", ctrl.LogoutUser, mid.MidOptionsUser()))
-	http.HandleFunc("/user/update/password", mid.Handler("PUT", ctrl.UpdateUserPassword, mid.MidOptionsUser()))
+	http.HandleFunc("/user/create", mid.Handler(ctrl.CreateUser, mid.Options{
+		CORS: true,
+		Preflight: true,
+		Method: "GET",
+	}))
+
+	http.HandleFunc("/user/login", mid.Handler(ctrl.LoginUser, mid.Options{
+		CORS: true,
+		Preflight: true,
+		Method: "POST",
+	}))
+
+	http.HandleFunc("/user/deleteall", mid.Handler(ctrl.DeleteAllUsers, mid.Options{
+		CORS: true,
+		Preflight: true,
+		Method: "DELETE",
+	}))
+
+	http.HandleFunc("/user/get", mid.Handler(ctrl.GetUser, mid.Options{
+		CORS: true,
+		Preflight: true,
+		Method: "GET",
+	}))
+
+	http.HandleFunc("/user/logout", mid.Handler(ctrl.LogoutUser, mid.Options{
+		CORS: true,
+		Preflight: true,
+		Method: "GET",
+	}))
+
+	http.HandleFunc("/user/update/password", mid.Handler(ctrl.UpdateUserPassword, mid.Options{
+		CORS: true,
+		Preflight: true,
+		Method: "POST",
+	}))
 
 }
