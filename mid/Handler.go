@@ -7,7 +7,7 @@ import (
 	"github.com/phillip-england/go-http/res"
 )
 
-func Handler(controller func(w http.ResponseWriter, r *http.Request),  options Options) http.HandlerFunc {
+func Handler(controller func(w http.ResponseWriter, r *http.Request), options Options) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		var ctx context.Context = nil

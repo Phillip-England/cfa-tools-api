@@ -1,7 +1,7 @@
 package routes
 
-func Mount() {
-	UserRoutes()
-	LocationRoutes()
-	CaresRoutes()
+func Mount(db DB) {
+	UserRoutes(ctx)
+	LocationRoutes(ctx)
+	CaresRoutes(ctx)
 }

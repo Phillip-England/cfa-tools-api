@@ -1,48 +1,49 @@
 package routes
 
 import (
+	"context"
 	"net/http"
 
 	ctrl "github.com/phillip-england/go-http/ctrl/user"
 	"github.com/phillip-england/go-http/mid"
 )
 
-func UserRoutes() {
+func UserRoutes(ctx context.Context) {
 
 	http.HandleFunc("/user/create", mid.Handler(ctrl.CreateUser, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "GET",
+		Method:    "GET",
 	}))
 
 	http.HandleFunc("/user/login", mid.Handler(ctrl.LoginUser, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "POST",
+		Method:    "POST",
 	}))
 
 	http.HandleFunc("/user/deleteall", mid.Handler(ctrl.DeleteAllUsers, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "DELETE",
+		Method:    "DELETE",
 	}))
 
 	http.HandleFunc("/user/get", mid.Handler(ctrl.GetUser, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "GET",
+		Method:    "GET",
 	}))
 
 	http.HandleFunc("/user/logout", mid.Handler(ctrl.LogoutUser, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "GET",
+		Method:    "GET",
 	}))
 
 	http.HandleFunc("/user/update/password", mid.Handler(ctrl.UpdateUserPassword, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "POST",
+		Method:    "POST",
 	}))
 
 }
