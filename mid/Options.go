@@ -4,6 +4,7 @@ type Options struct {
 	CORS      bool
 	Preflight bool
 	Auth      bool
+	Location  bool
 }
 
 func MidOptionsGuest() (options Options) {

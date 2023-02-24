@@ -13,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func Auth(ctx context.Context, w http.ResponseWriter, r *http.Request) (httpctx context.Context, response func()) {
+func Auth(w http.ResponseWriter, r *http.Request) (httpctx context.Context, response func()) {
 
 	token, tokenErr := r.Cookie("token")
 	refresh, refreshErr := r.Cookie("refresh")
@@ -78,6 +78,6 @@ func Auth(ctx context.Context, w http.ResponseWriter, r *http.Request) (httpctx 
 	const userKey model.ContextKey = "user"
 	httpctx = context.WithValue(r.Context(), userKey, user)
 
-	return nil, nil
+	return httpctx, nil
 
 }

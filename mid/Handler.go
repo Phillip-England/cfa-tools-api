@@ -31,11 +31,21 @@ func Handler(method string, controller func(w http.ResponseWriter, r *http.Reque
 
 		if options.Auth {
 			var response func()
-			ctx, response = Auth(r.Context(), w, r)
+			ctx, response = Auth(w, r)
 			if response != nil {
 				response()
 				return
 			}
+		}
+
+		if options.Location {
+			var response func()
+			ctx, response = Location(ctx, w, r)
+			if response != nil {
+				response()
+				return
+			}
+
 		}
 
 		if ctx == nil {

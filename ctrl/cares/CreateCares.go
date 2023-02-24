@@ -7,9 +7,6 @@ import (
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
 )
 
 func CreateCares(w http.ResponseWriter, r *http.Request) {
@@ -39,35 +36,15 @@ func CreateCares(w http.ResponseWriter, r *http.Request) {
 	const userKey model.ContextKey = "user"
 	user := r.Context().Value(userKey).(model.User)
 
-	locationID, err := primitive.ObjectIDFromHex(body.LocationID)
-	if err != nil {
-		res.ServerError(w, err)
-		return
-	}
+	const locationKey model.ContextKey = "location"
+	location := r.Context().Value(locationKey).(model.Location)
 
 	ctx, client, disconnect := db.Connect()
 	defer disconnect()
-	coll := db.Collection(client, "locations")
-
-	filter := bson.D{{Key: "_id", Value: locationID}}
-	var location model.LocationResponse
-	err = coll.FindOne(ctx, filter).Decode(&location)
-	if err == mongo.ErrNoDocuments {
-		res.ResourceNotFound(w)
-		return
-	} else if err != nil {
-		res.ServerError(w, err)
-		return
-	}
-
-	if location.User != user.ID {
-		res.Forbidden(w)
-		return
-	}
 
 	cares := model.Cares{
 		User:              user.ID,
-		Location:          locationID,
+		Location:          location.ID,
 		GuestName:         body.GuestName,
 		OrderNumber:       body.OrderNumber,
 		Incident:          body.Incident,
@@ -75,7 +52,7 @@ func CreateCares(w http.ResponseWriter, r *http.Request) {
 	}
 	cares.Timestamp()
 
-	coll = db.Collection(client, "cares")
+	coll := db.Collection(client, "cares")
 	err = cares.SetReplacementCode(ctx, coll)
 	if err != nil {
 		res.ServerError(w, err)
