@@ -24,4 +24,21 @@ func CaresRoutes() {
 		Auth: true,
 		Location: true,
 	}))
+
+	http.HandleFunc("/cares/get/all", mid.Handler(ctrl.GetAllCares, mid.Options{
+		CORS: true,
+		Preflight: true,
+		Method: "GET",
+		Auth: true,
+		Location: true,
+	}))
+
+	http.HandleFunc("/cares/update/", mid.Handler(ctrl.UpdateCares, mid.Options{
+		CORS: true,
+		Preflight: true,
+		Method: "PUT",
+		Auth: true,
+		Location: true,
+	}))
+
 }

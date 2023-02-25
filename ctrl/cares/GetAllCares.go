@@ -1,0 +1,58 @@
+package ctrl
+
+import (
+	"encoding/json"
+	"net/http"
+
+	"github.com/phillip-england/go-http/db"
+	"github.com/phillip-england/go-http/model"
+	"github.com/phillip-england/go-http/res"
+	"go.mongodb.org/mongo-driver/bson"
+)
+
+func GetAllCares(w http.ResponseWriter, r *http.Request) {
+
+	// const userKey model.ContextKey = "user"
+	// user := r.Context().Value(userKey).(model.User)
+
+	const locationKey model.ContextKey = "location"
+	location := r.Context().Value(locationKey).(model.Location)
+
+	ctx, client, disconnect := db.Connect()
+	defer disconnect()
+	coll := db.Collection(client, "cares")
+
+	filter := bson.D{{Key: "location", Value: location.ID}}
+
+	cursor, err := coll.Find(ctx, filter)
+	if err != nil {
+		res.ServerError(w, err)
+		return
+	}
+	defer cursor.Close(ctx)
+
+	var allCares []model.Cares
+	for cursor.Next(ctx) {
+		var cares model.Cares
+		if err := cursor.Decode(&cares); err != nil {
+			res.ServerError(w, err)
+			return
+		}
+		allCares = append(allCares, cares)
+	}
+
+	httpResponse := model.HttpResponse{
+		Message: "success",
+		Data: allCares,
+	}
+
+	jsonData, err := json.Marshal(httpResponse)
+	if err != nil {
+		res.ServerError(w, err)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write(jsonData)
+
+}

@@ -7,20 +7,3 @@ type Options struct {
 	Auth      bool
 	Location  bool
 }
-
-func MidOptionsGuest() (options Options) {
-	options = Options{
-		CORS:      true,
-		Preflight: true,
-	}
-	return options
-}
-
-func MidOptionsUser() (options Options) {
-	options = Options{
-		CORS:      true,
-		Preflight: true,
-		Auth:      true,
-	}
-	return options
-}

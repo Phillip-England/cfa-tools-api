@@ -12,7 +12,7 @@ func UserRoutes() {
 	http.HandleFunc("/user/create", mid.Handler(ctrl.CreateUser, mid.Options{
 		CORS: true,
 		Preflight: true,
-		Method: "GET",
+		Method: "POST",
 	}))
 
 	http.HandleFunc("/user/login", mid.Handler(ctrl.LoginUser, mid.Options{
@@ -31,18 +31,23 @@ func UserRoutes() {
 		CORS: true,
 		Preflight: true,
 		Method: "GET",
+		Auth: true,
 	}))
 
 	http.HandleFunc("/user/logout", mid.Handler(ctrl.LogoutUser, mid.Options{
 		CORS: true,
 		Preflight: true,
 		Method: "GET",
+		Auth: true,
 	}))
 
 	http.HandleFunc("/user/update/password", mid.Handler(ctrl.UpdateUserPassword, mid.Options{
 		CORS: true,
 		Preflight: true,
-		Method: "POST",
+		Method: "PUT",
+		Auth: true,
 	}))
+
+	
 
 }

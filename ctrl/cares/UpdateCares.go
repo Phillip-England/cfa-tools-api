@@ -2,6 +2,7 @@ package ctrl
 
 import (
 	"net/http"
+	"time"
 
 	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/model"
@@ -12,7 +13,16 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func DeleteCares(w http.ResponseWriter, r *http.Request) {
+func UpdateCares(w http.ResponseWriter, r *http.Request) {
+
+	type requestBody struct {
+		LocationID        string `json:"locationID"`
+		GuestName         string `json:"guestName"`
+		OrderNumber       string `json:"orderNumber"`
+		Incident          string `json:"incident"`
+		ReplacementAction string `json:"replacementAction"`
+		CSRF              string `json:"_csrf"`
+	}
 
 	id := net.GetURLParam(r.URL.Path)
 	caresID, err := primitive.ObjectIDFromHex(id)
@@ -21,14 +31,27 @@ func DeleteCares(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	body := requestBody{}
+	err = net.GetBody(w, r, &body)
+	if err != nil {
+		res.ServerError(w, err)
+		return
+	}
+
+	err = net.IsCSRF(body.CSRF)
+	if err != nil {
+		res.Forbidden(w)
+		return
+	}
+
 	const locationKey model.ContextKey = "location"
 	location := r.Context().Value(locationKey).(model.Location)
 
 	ctx, client, disconnect := db.Connect()
-	defer disconnect()
 	coll := db.Collection(client, "cares")
+	defer disconnect()
 
-	var cares model.Cares
+	cares := model.Cares{}
 	filter := bson.D{{Key: "_id", Value: caresID}}
 	err = coll.FindOne(ctx, filter).Decode(&cares)
 	if err == mongo.ErrNoDocuments {
@@ -44,12 +67,21 @@ func DeleteCares(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = coll.DeleteOne(ctx, filter)
+	filter = bson.D{{
+		Key: "$set", Value: bson.D{
+			{Key: "guestName", Value: body.GuestName},
+			{Key: "orderNumber", Value: body.OrderNumber},
+			{Key: "incident", Value: body.Incident},
+			{Key: "replacementAction", Value: body.ReplacementAction},
+			{Key: "updatedAt", Value: time.Now()},
+		},
+	}}
+	_, err = coll.UpdateByID(ctx, caresID, filter)
 	if err != nil {
 		res.ServerError(w, err)
 		return
 	}
-
+	
 	res.Success(w)
 
 }

@@ -64,7 +64,7 @@ func UpdateLocation(w http.ResponseWriter, r *http.Request) {
 		Key: "$set", Value: bson.D{
 			{Key: "name", Value: body.Name},
 			{Key: "number", Value: body.Number},
-			{Key: "updated_at", Value: time.Now()},
+			{Key: "updatedAt", Value: time.Now()},
 		},
 	}}
 	_, err = coll.UpdateByID(ctx, location.ID, filter)
