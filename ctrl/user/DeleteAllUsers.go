@@ -3,24 +3,21 @@ package ctrl
 import (
 	"net/http"
 
-	"github.com/phillip-england/go-http/db"
+	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func DeleteAllUsers(w http.ResponseWriter, r *http.Request) {
+func DeleteAllUsers(w http.ResponseWriter, r *http.Request, db model.Db) {
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
+	coll := db.Collection("users")
+	coll.DeleteMany(db.Ctx, bson.D{})
 
-	coll := db.Collection(client, "users")
-	coll.DeleteMany(ctx, bson.D{})
+	coll = db.Collection("locations")
+	coll.DeleteMany(db.Ctx, bson.D{})
 
-	coll = db.Collection(client, "locations")
-	coll.DeleteMany(ctx, bson.D{})
-
-	coll = db.Collection(client, "cares")
-	coll.DeleteMany(ctx, bson.D{})
+	coll = db.Collection("cares")
+	coll.DeleteMany(db.Ctx, bson.D{})
 
 	res.Success(w)
 

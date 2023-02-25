@@ -4,31 +4,28 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func GetLocations(w http.ResponseWriter, r *http.Request) {
+func GetLocations(w http.ResponseWriter, r *http.Request, db model.Db) {
 
 	const userKey model.ContextKey = "user"
 	user := r.Context().Value(userKey).(model.User)
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
-	coll := db.Collection(client, "locations")
+	coll := db.Collection("locations")
 
 	filter := bson.D{{Key: "user", Value: user.ID}}
-	cursor, err := coll.Find(ctx, filter)
+	cursor, err := coll.Find(db.Ctx, filter)
 	if err != nil {
 		res.ServerError(w, err)
 		return
 	}
-	defer cursor.Close(ctx)
+	defer cursor.Close(db.Ctx)
 
 	var locations []model.LocationResponse
-	for cursor.Next(ctx) {
+	for cursor.Next(db.Ctx) {
 		var location model.LocationResponse
 		if err := cursor.Decode(&location); err != nil {
 			res.ServerError(w, err)

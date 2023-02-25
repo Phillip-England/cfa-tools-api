@@ -4,7 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
@@ -12,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func Location(ctx context.Context, w http.ResponseWriter, r *http.Request) (newctx context.Context, response func()) {
+func Location(ctx context.Context, w http.ResponseWriter, r *http.Request, db model.Db) (newctx context.Context, response func()) {
 
 	const userKey model.ContextKey = "user"
 	const locationKey model.ContextKey = "location"
@@ -31,9 +30,7 @@ func Location(ctx context.Context, w http.ResponseWriter, r *http.Request) (newc
 		return
 	}
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
-	coll := db.Collection(client, "locations")
+	coll := db.Collection("locations")
 
 	filter := bson.D{{Key: "_id", Value: locationID}}
 	var location model.Location

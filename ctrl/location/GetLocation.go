@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
@@ -13,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetLocation(w http.ResponseWriter, r *http.Request) {
+func GetLocation(w http.ResponseWriter, r *http.Request, db model.Db) {
 
 	parts := strings.Split(r.URL.Path, "/")
 	id := parts[len(parts)-1]
@@ -26,13 +25,11 @@ func GetLocation(w http.ResponseWriter, r *http.Request) {
 	const userKey model.ContextKey = "user"
 	user := r.Context().Value(userKey).(model.User)
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
-	coll := db.Collection(client, "locations")
+	coll := db.Collection("locations")
 
 	filter := bson.D{{Key: "_id", Value: locationID}}
 	var location model.LocationResponse
-	err = coll.FindOne(ctx, filter).Decode(&location)
+	err = coll.FindOne(db.Ctx, filter).Decode(&location)
 	if err == mongo.ErrNoDocuments {
 		res.ResourceNotFound(w)
 		return

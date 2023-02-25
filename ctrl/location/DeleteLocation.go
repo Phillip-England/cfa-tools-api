@@ -3,7 +3,6 @@ package ctrl
 import (
 	"net/http"
 
-	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
@@ -12,7 +11,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func DeleteLocation(w http.ResponseWriter, r *http.Request) {
+func DeleteLocation(w http.ResponseWriter, r *http.Request, db model.Db) {
 
 	id := net.GetURLParam(r.URL.Path)
 	locationID, err := primitive.ObjectIDFromHex(id)
@@ -24,13 +23,11 @@ func DeleteLocation(w http.ResponseWriter, r *http.Request) {
 	const userKey model.ContextKey = "user"
 	user := r.Context().Value(userKey).(model.User)
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
-	coll := db.Collection(client, "locations")
+	coll := db.Collection("locations")
 
 	var location model.Location
 	filter := bson.D{{Key: "_id", Value: locationID}}
-	err = coll.FindOne(ctx, filter).Decode(&location)
+	err = coll.FindOne(db.Ctx, filter).Decode(&location)
 	if err == mongo.ErrNoDocuments {
 		res.ResourceNotFound(w)
 		return
@@ -44,7 +41,7 @@ func DeleteLocation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = coll.DeleteOne(ctx, filter)
+	_, err = coll.DeleteOne(db.Ctx, filter)
 	if err != nil {
 		res.ServerError(w, err)
 		return

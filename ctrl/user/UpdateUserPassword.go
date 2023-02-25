@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/net"
@@ -13,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 )
 
-func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
+func UpdateUserPassword(w http.ResponseWriter, r *http.Request, db model.Db) {
 
 	type requestBody struct {
 		CurrentPassword string `json:"currentPassword"`
@@ -55,9 +54,7 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
-	coll := db.Collection(client, "users")
+	coll := db.Collection("users")
 
 	filter := bson.D{{
 		Key: "$set", Value: bson.D{
@@ -65,7 +62,7 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 			{Key: "updated_at", Value: time.Now()},
 		},
 	}}
-	_, err = coll.UpdateByID(ctx, user.ID, filter)
+	_, err = coll.UpdateByID(db.Ctx, user.ID, filter)
 	if err != nil {
 		res.ServerError(w, err)
 		return

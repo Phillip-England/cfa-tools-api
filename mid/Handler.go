@@ -4,10 +4,11 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/res"
 )
 
-func Handler(controller func(w http.ResponseWriter, r *http.Request), options Options) http.HandlerFunc {
+func Handler(controller func(w http.ResponseWriter, r *http.Request, db model.Db), db model.Db, options Options) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		var ctx context.Context = nil
@@ -31,7 +32,7 @@ func Handler(controller func(w http.ResponseWriter, r *http.Request), options Op
 
 		if options.Auth {
 			var response func()
-			ctx, response = Auth(w, r)
+			ctx, response = Auth(w, r, db)
 			if response != nil {
 				response()
 				return
@@ -40,7 +41,7 @@ func Handler(controller func(w http.ResponseWriter, r *http.Request), options Op
 
 		if options.Location {
 			var response func()
-			ctx, response = Location(ctx, w, r)
+			ctx, response = Location(ctx, w, r, db)
 			if response != nil {
 				response()
 				return
@@ -49,11 +50,11 @@ func Handler(controller func(w http.ResponseWriter, r *http.Request), options Op
 		}
 
 		if ctx == nil {
-			controller(w, r)
+			controller(w, r, db)
 			return
 		}
 
-		controller(w, r.WithContext(ctx))
+		controller(w, r.WithContext(ctx), db)
 
 	}
 

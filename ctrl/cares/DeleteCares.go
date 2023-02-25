@@ -10,7 +10,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func DeleteCares(w http.ResponseWriter, r *http.Request) {
+func DeleteCares(w http.ResponseWriter, r *http.Request, db model.Db) {
 
 	id := net.GetURLParam(r.URL.Path)
 	caresID, err := primitive.ObjectIDFromHex(id)

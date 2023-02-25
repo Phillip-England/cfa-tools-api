@@ -3,13 +3,12 @@ package ctrl
 import (
 	"net/http"
 
-	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
 )
 
-func CreateLocation(w http.ResponseWriter, r *http.Request) {
+func CreateLocation(w http.ResponseWriter, r *http.Request, db model.Db) {
 
 	type requestBody struct {
 		Name   string `json:"name"`
@@ -39,11 +38,9 @@ func CreateLocation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
-	coll := db.Collection(client, "locations")
+	coll := db.Collection("locations")
 
-	_, err = coll.InsertOne(ctx, location)
+	_, err = coll.InsertOne(db.Ctx, location)
 	if err != nil {
 		res.ServerError(w, err)
 		return

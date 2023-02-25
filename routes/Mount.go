@@ -1,7 +1,11 @@
 package routes
 
-func Mount(db DB) {
-	UserRoutes(ctx)
-	LocationRoutes(ctx)
-	CaresRoutes(ctx)
+import (
+	"github.com/phillip-england/go-http/model"
+)
+
+func Mount(db model.Db) {
+	UserRoutes(db)
+	LocationRoutes(db)
+	CaresRoutes(db)
 }

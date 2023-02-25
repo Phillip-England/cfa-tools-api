@@ -3,7 +3,6 @@ package ctrl
 import (
 	"net/http"
 
-	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/net"
@@ -13,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func CreateUser(w http.ResponseWriter, r *http.Request, db model.Db) {
 
 	type requestBody struct {
 		Email    string `json:"email"`
@@ -32,13 +31,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		res.ServerError(w, err)
 	}
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
-	coll := db.Collection(client, "users")
+	coll := db.Collection("users")
 
 	var userExists model.User
 	filter := bson.D{{Key: "email", Value: user.Email}}
-	err = coll.FindOne(ctx, filter).Decode(&userExists)
+	err = coll.FindOne(db.Ctx, filter).Decode(&userExists)
 	if userExists.Email == user.Email && err != mongo.ErrNoDocuments {
 		res.MessageResponse(w, "user already exists", 400)
 		return
@@ -48,7 +45,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := coll.InsertOne(ctx, user)
+	result, err := coll.InsertOne(db.Ctx, user)
 	if err != nil {
 		res.ServerError(w, err)
 		return

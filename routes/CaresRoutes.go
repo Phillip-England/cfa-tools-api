@@ -1,16 +1,16 @@
 package routes
 
 import (
-	"context"
 	"net/http"
 
 	ctrl "github.com/phillip-england/go-http/ctrl/cares"
 	"github.com/phillip-england/go-http/mid"
+	"github.com/phillip-england/go-http/model"
 )
 
-func CaresRoutes(ctx context.Context) {
+func CaresRoutes(db model.Db) {
 
-	http.HandleFunc("/cares/delete/", mid.Handler(ctrl.DeleteCares, mid.Options{
+	http.HandleFunc("/cares/delete/", mid.Handler(ctrl.DeleteCares, db, mid.Options{
 		CORS:      true,
 		Preflight: true,
 		Method:    "DELETE",
@@ -18,7 +18,7 @@ func CaresRoutes(ctx context.Context) {
 		Location:  true,
 	}))
 
-	http.HandleFunc("/cares/create", mid.Handler(ctrl.CreateCares, mid.Options{
+	http.HandleFunc("/cares/create", mid.Handler(ctrl.CreateCares, db, mid.Options{
 		CORS:      true,
 		Preflight: true,
 		Method:    "POST",

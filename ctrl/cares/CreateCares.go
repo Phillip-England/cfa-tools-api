@@ -3,13 +3,12 @@ package ctrl
 import (
 	"net/http"
 
-	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
 )
 
-func CreateCares(w http.ResponseWriter, r *http.Request) {
+func CreateCares(w http.ResponseWriter, r *http.Request, db model.Db) {
 
 	type requestBody struct {
 		LocationID        string `json:"locationID"`
@@ -39,9 +38,6 @@ func CreateCares(w http.ResponseWriter, r *http.Request) {
 	const locationKey model.ContextKey = "location"
 	location := r.Context().Value(locationKey).(model.Location)
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
-
 	cares := model.Cares{
 		User:              user.ID,
 		Location:          location.ID,
@@ -52,14 +48,14 @@ func CreateCares(w http.ResponseWriter, r *http.Request) {
 	}
 	cares.Timestamp()
 
-	coll := db.Collection(client, "cares")
-	err = cares.SetReplacementCode(ctx, coll)
+	coll := db.Collection("cares")
+	err = cares.SetReplacementCode(db.Ctx, coll)
 	if err != nil {
 		res.ServerError(w, err)
 		return
 	}
 
-	_, err = coll.InsertOne(ctx, cares)
+	_, err = coll.InsertOne(db.Ctx, cares)
 	if err != nil {
 		res.ServerError(w, err)
 		return

@@ -9,7 +9,7 @@ import (
 	"github.com/phillip-england/go-http/res"
 )
 
-func GetUser(w http.ResponseWriter, r *http.Request) {
+func GetUser(w http.ResponseWriter, r *http.Request, db model.Db) {
 
 	const userKey model.ContextKey = "user"
 	user := r.Context().Value(userKey).(model.User)
