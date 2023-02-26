@@ -1,19 +1,19 @@
 package ctrl
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
 	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
-	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func LoginUser(w http.ResponseWriter, r *http.Request) {
+func LoginUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
 	type requestBody struct {
 		Email    string `json:"email"`
@@ -21,7 +21,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	body := requestBody{}
-	err := net.GetBody(w, r, &body)
+	err := lib.GetBody(w, r, &body)
 	if err != nil {
 		res.ServerError(w, err)
 		return
@@ -29,13 +29,11 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 
 	body.Email = strings.ToLower(body.Email)
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
 	coll := db.Collection(client, "users")
 
 	var userExists model.User
 	filter := bson.D{{Key: "email", Value: body.Email}}
-	err = coll.FindOne(ctx, filter).Decode(&userExists)
+	err = coll.FindOne(context.Background(), filter).Decode(&userExists)
 
 	if err == mongo.ErrNoDocuments {
 		res.BadReqeust(w, "invalid credentials")
@@ -62,7 +60,7 @@ func LoginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	net.HttpCookie(w, "token", signedString, 30)
+	lib.HttpCookie(w, "token", signedString, 30)
 
 	res.MessageResponse(w, "success", 200)
 

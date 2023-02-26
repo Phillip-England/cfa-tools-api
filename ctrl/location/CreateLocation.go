@@ -1,15 +1,17 @@
 package ctrl
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/phillip-england/go-http/db"
+	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
-	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func CreateLocation(w http.ResponseWriter, r *http.Request) {
+func CreateLocation(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
 	type requestBody struct {
 		Name   string `json:"name"`
@@ -18,13 +20,13 @@ func CreateLocation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	body := requestBody{}
-	err := net.GetBody(w, r, &body)
+	err := lib.GetBody(w, r, &body)
 	if err != nil {
 		res.ServerError(w, err)
 		return
 	}
 
-	err = net.IsCSRF(body.CSRF)
+	err = lib.IsCSRF(body.CSRF)
 	if err != nil {
 		res.Forbidden(w)
 		return
@@ -39,11 +41,9 @@ func CreateLocation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
 	coll := db.Collection(client, "locations")
 
-	_, err = coll.InsertOne(ctx, location)
+	_, err = coll.InsertOne(context.Background(), location)
 	if err != nil {
 		res.ServerError(w, err)
 		return

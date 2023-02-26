@@ -1,19 +1,20 @@
 package ctrl
 
 import (
+	"context"
 	"net/http"
 	"time"
 
 	"github.com/phillip-england/go-http/db"
+	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
-	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func UpdateCares(w http.ResponseWriter, r *http.Request) {
+func UpdateCares(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
 	type requestBody struct {
 		LocationID        string `json:"locationID"`
@@ -24,7 +25,7 @@ func UpdateCares(w http.ResponseWriter, r *http.Request) {
 		CSRF              string `json:"_csrf"`
 	}
 
-	id := net.GetURLParam(r.URL.Path)
+	id := lib.GetURLParam(r.URL.Path)
 	caresID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		res.ResourceNotFound(w)
@@ -32,13 +33,13 @@ func UpdateCares(w http.ResponseWriter, r *http.Request) {
 	}
 
 	body := requestBody{}
-	err = net.GetBody(w, r, &body)
+	err = lib.GetBody(w, r, &body)
 	if err != nil {
 		res.ServerError(w, err)
 		return
 	}
 
-	err = net.IsCSRF(body.CSRF)
+	err = lib.IsCSRF(body.CSRF)
 	if err != nil {
 		res.Forbidden(w)
 		return
@@ -47,13 +48,11 @@ func UpdateCares(w http.ResponseWriter, r *http.Request) {
 	const locationKey model.ContextKey = "location"
 	location := r.Context().Value(locationKey).(model.Location)
 
-	ctx, client, disconnect := db.Connect()
 	coll := db.Collection(client, "cares")
-	defer disconnect()
 
 	cares := model.Cares{}
 	filter := bson.D{{Key: "_id", Value: caresID}}
-	err = coll.FindOne(ctx, filter).Decode(&cares)
+	err = coll.FindOne(context.Background(), filter).Decode(&cares)
 	if err == mongo.ErrNoDocuments {
 		res.ResourceNotFound(w)
 		return
@@ -76,7 +75,7 @@ func UpdateCares(w http.ResponseWriter, r *http.Request) {
 			{Key: "updatedAt", Value: time.Now()},
 		},
 	}}
-	_, err = coll.UpdateByID(ctx, caresID, filter)
+	_, err = coll.UpdateByID(context.Background(), caresID, filter)
 	if err != nil {
 		res.ServerError(w, err)
 		return

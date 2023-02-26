@@ -7,13 +7,13 @@ import (
 	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
-	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func Auth(w http.ResponseWriter, r *http.Request) (httpctx context.Context, response func()) {
+func Auth(client *mongo.Client, w http.ResponseWriter, r *http.Request) (httpctx context.Context, response func()) {
 
 	token, tokenErr := r.Cookie("token")
 	refresh, refreshErr := r.Cookie("refresh")
@@ -56,10 +56,8 @@ func Auth(w http.ResponseWriter, r *http.Request) (httpctx context.Context, resp
 			res.ServerError(w, err)
 		}
 	}
-	net.HttpCookie(w, "refresh", signedStringRefresh, 45)
-	net.HttpCookie(w, "token", signedStringToken, 30)
-	dbctx, client, disconnect := db.Connect()
-	defer disconnect()
+	lib.HttpCookie(w, "refresh", signedStringRefresh, 45)
+	lib.HttpCookie(w, "token", signedStringToken, 30)
 	coll := db.Collection(client, "users")
 	objectID, err := primitive.ObjectIDFromHex(jwtData.(string))
 	if err != nil {
@@ -69,7 +67,7 @@ func Auth(w http.ResponseWriter, r *http.Request) (httpctx context.Context, resp
 	}
 	var user model.User
 	filter := bson.D{{Key: "_id", Value: objectID}}
-	err = coll.FindOne(dbctx, filter).Decode(&user)
+	err = coll.FindOne(context.Background(), filter).Decode(&user)
 	if err != nil {
 		return nil, func() {
 			res.ServerError(w, err)

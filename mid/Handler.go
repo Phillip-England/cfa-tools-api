@@ -5,9 +5,10 @@ import (
 	"net/http"
 
 	"github.com/phillip-england/go-http/res"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func Handler(controller func(w http.ResponseWriter, r *http.Request),  options Options) http.HandlerFunc {
+func Handler(controller func(client *mongo.Client, w http.ResponseWriter, r *http.Request), client *mongo.Client,  options Options) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		var ctx context.Context = nil
@@ -31,7 +32,7 @@ func Handler(controller func(w http.ResponseWriter, r *http.Request),  options O
 
 		if options.Auth {
 			var response func()
-			ctx, response = Auth(w, r)
+			ctx, response = Auth(client, w, r)
 			if response != nil {
 				response()
 				return
@@ -40,7 +41,7 @@ func Handler(controller func(w http.ResponseWriter, r *http.Request),  options O
 
 		if options.Location {
 			var response func()
-			ctx, response = Location(ctx, w, r)
+			ctx, response = Location(ctx, client, w, r)
 			if response != nil {
 				response()
 				return
@@ -49,11 +50,11 @@ func Handler(controller func(w http.ResponseWriter, r *http.Request),  options O
 		}
 
 		if ctx == nil {
-			controller(w, r)
+			controller(client, w, r)
 			return
 		}
 
-		controller(w, r.WithContext(ctx))
+		controller(client, w, r.WithContext(ctx))
 
 	}
 

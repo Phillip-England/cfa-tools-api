@@ -3,13 +3,14 @@ package ctrl
 import (
 	"net/http"
 
-	"github.com/phillip-england/go-http/net"
+	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/res"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func DropActiveLocation(w http.ResponseWriter, r *http.Request) {
+func DropActiveLocation(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
-	net.HttpCookie(w, "location", "", -10)
+	lib.HttpCookie(w, "location", "", -10)
 	res.Success(w)
 
 }

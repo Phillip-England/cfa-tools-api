@@ -1,19 +1,20 @@
 package ctrl
 
 import (
+	"context"
 	"net/http"
 	"strings"
 
 	"github.com/phillip-england/go-http/db"
+	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
-	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func SelectLocation(w http.ResponseWriter, r *http.Request) {
+func SelectLocation(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
 	parts := strings.Split(r.URL.Path, "/")
 	id := parts[len(parts)-1]
@@ -26,13 +27,11 @@ func SelectLocation(w http.ResponseWriter, r *http.Request) {
 	const userKey model.ContextKey = "user"
 	user := r.Context().Value(userKey).(model.User)
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
 	coll := db.Collection(client, "locations")
 
 	filter := bson.D{{Key: "_id", Value: locationID}}
 	var location model.LocationResponse
-	err = coll.FindOne(ctx, filter).Decode(&location)
+	err = coll.FindOne(context.Background(), filter).Decode(&location)
 	if err == mongo.ErrNoDocuments {
 		res.ResourceNotFound(w)
 		return
@@ -46,7 +45,7 @@ func SelectLocation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	net.HttpCookie(w, "location", id, 1440)
+	lib.HttpCookie(w, "location", id, 1440)
 
 	res.Success(w)
 

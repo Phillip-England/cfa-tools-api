@@ -1,19 +1,19 @@
 package ctrl
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
-	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func CreateUser(w http.ResponseWriter, r *http.Request) {
+func CreateUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
 	type requestBody struct {
 		Email    string `json:"email"`
@@ -21,7 +21,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	body := requestBody{}
-	err := net.GetBody(w, r, &body)
+	err := lib.GetBody(w, r, &body)
 	if err != nil {
 		res.ServerError(w, err)
 		return
@@ -32,13 +32,11 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		res.ServerError(w, err)
 	}
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
 	coll := db.Collection(client, "users")
 
 	var userExists model.User
 	filter := bson.D{{Key: "email", Value: user.Email}}
-	err = coll.FindOne(ctx, filter).Decode(&userExists)
+	err = coll.FindOne(context.Background(), filter).Decode(&userExists)
 	if userExists.Email == user.Email && err != mongo.ErrNoDocuments {
 		res.MessageResponse(w, "user already exists", 400)
 		return
@@ -48,7 +46,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	result, err := coll.InsertOne(ctx, user)
+	result, err := coll.InsertOne(context.Background(), user)
 	if err != nil {
 		res.ServerError(w, err)
 		return
@@ -61,7 +59,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	net.HttpCookie(w, "token", signedString, 30)
+	lib.HttpCookie(w, "token", signedString, 30)
 
 	res.Success(w)
 

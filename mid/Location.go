@@ -12,7 +12,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func Location(ctx context.Context, w http.ResponseWriter, r *http.Request) (newctx context.Context, response func()) {
+func Location(ctx context.Context, client *mongo.Client, w http.ResponseWriter, r *http.Request) (newctx context.Context, response func()) {
 
 	const userKey model.ContextKey = "user"
 	const locationKey model.ContextKey = "location"
@@ -31,13 +31,11 @@ func Location(ctx context.Context, w http.ResponseWriter, r *http.Request) (newc
 		return
 	}
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
 	coll := db.Collection(client, "locations")
 
 	filter := bson.D{{Key: "_id", Value: locationID}}
 	var location model.Location
-	err = coll.FindOne(ctx, filter).Decode(&location)
+	err = coll.FindOne(context.Background(), filter).Decode(&location)
 	if err == mongo.ErrNoDocuments {
 		return nil, func() {
 			res.ResourceNotFound(w)

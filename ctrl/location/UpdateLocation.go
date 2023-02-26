@@ -1,19 +1,20 @@
 package ctrl
 
 import (
+	"context"
 	"net/http"
 	"time"
 
 	"github.com/phillip-england/go-http/db"
+	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
-	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func UpdateLocation(w http.ResponseWriter, r *http.Request) {
+func UpdateLocation(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
 	type requestBody struct {
 		Name   string `json:"name"`
@@ -22,16 +23,16 @@ func UpdateLocation(w http.ResponseWriter, r *http.Request) {
 	}
 
 	body := requestBody{}
-	net.GetBody(w, r, &body)
+	lib.GetBody(w, r, &body)
 
-	id := net.GetURLParam(r.URL.Path)
+	id := lib.GetURLParam(r.URL.Path)
 	locationID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		res.ResourceNotFound(w)
 		return
 	}
 
-	err = net.IsCSRF(body.CSRF)
+	err = lib.IsCSRF(body.CSRF)
 	if err != nil {
 		res.Forbidden(w)
 		return
@@ -40,13 +41,11 @@ func UpdateLocation(w http.ResponseWriter, r *http.Request) {
 	const userKey model.ContextKey = "user"
 	user := r.Context().Value(userKey).(model.User)
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
 	coll := db.Collection(client, "locations")
 
 	location := model.Location{}
 	filter := bson.D{{Key: "_id", Value: locationID}}
-	err = coll.FindOne(ctx, filter).Decode(&location)
+	err = coll.FindOne(context.Background(), filter).Decode(&location)
 	if err == mongo.ErrNoDocuments {
 		res.ResourceNotFound(w)
 		return
@@ -67,7 +66,7 @@ func UpdateLocation(w http.ResponseWriter, r *http.Request) {
 			{Key: "updatedAt", Value: time.Now()},
 		},
 	}}
-	_, err = coll.UpdateByID(ctx, location.ID, filter)
+	_, err = coll.UpdateByID(context.Background(), location.ID, filter)
 	if err != nil {
 		res.ServerError(w, err)
 		return

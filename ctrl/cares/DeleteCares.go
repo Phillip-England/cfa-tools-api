@@ -1,20 +1,21 @@
 package ctrl
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/phillip-england/go-http/db"
+	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
-	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func DeleteCares(w http.ResponseWriter, r *http.Request) {
+func DeleteCares(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
-	id := net.GetURLParam(r.URL.Path)
+	id := lib.GetURLParam(r.URL.Path)
 	caresID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		res.ResourceNotFound(w)
@@ -24,13 +25,11 @@ func DeleteCares(w http.ResponseWriter, r *http.Request) {
 	const locationKey model.ContextKey = "location"
 	location := r.Context().Value(locationKey).(model.Location)
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
 	coll := db.Collection(client, "cares")
 
 	var cares model.Cares
 	filter := bson.D{{Key: "_id", Value: caresID}}
-	err = coll.FindOne(ctx, filter).Decode(&cares)
+	err = coll.FindOne(context.Background(), filter).Decode(&cares)
 	if err == mongo.ErrNoDocuments {
 		res.ResourceNotFound(w)
 		return
@@ -44,7 +43,7 @@ func DeleteCares(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = coll.DeleteOne(ctx, filter)
+	_, err = coll.DeleteOne(context.Background(), filter)
 	if err != nil {
 		res.ServerError(w, err)
 		return

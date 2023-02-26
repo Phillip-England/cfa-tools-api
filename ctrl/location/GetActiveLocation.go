@@ -1,6 +1,7 @@
 package ctrl
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
@@ -12,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetActiveLocation(w http.ResponseWriter, r *http.Request) {
+func GetActiveLocation(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
 	const userKey model.ContextKey = "user"
 	user := r.Context().Value(userKey).(model.User)
@@ -29,13 +30,11 @@ func GetActiveLocation(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
 	coll := db.Collection(client, "locations")
 
 	filter := bson.D{{Key: "_id", Value: locationID}}
 	var location model.LocationResponse
-	err = coll.FindOne(ctx, filter).Decode(&location)
+	err = coll.FindOne(context.Background(), filter).Decode(&location)
 	if err == mongo.ErrNoDocuments {
 		res.ResourceNotFound(w)
 		return

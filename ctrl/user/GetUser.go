@@ -4,12 +4,13 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
-	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetUser(w http.ResponseWriter, r *http.Request) {
+func GetUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
 	const userKey model.ContextKey = "user"
 	user := r.Context().Value(userKey).(model.User)
@@ -19,7 +20,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		Email: user.Email,
 	}
 
-	token, err := net.GetCSRF()
+	token, err := lib.GetCSRF()
 	if err != nil {
 		res.ServerError(w, err)
 		return

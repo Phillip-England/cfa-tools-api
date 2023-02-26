@@ -1,15 +1,17 @@
 package ctrl
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/phillip-england/go-http/db"
+	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
-	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func CreateCares(w http.ResponseWriter, r *http.Request) {
+func CreateCares(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
 	type requestBody struct {
 		LocationID        string `json:"locationID"`
@@ -21,13 +23,13 @@ func CreateCares(w http.ResponseWriter, r *http.Request) {
 	}
 
 	body := requestBody{}
-	err := net.GetBody(w, r, &body)
+	err := lib.GetBody(w, r, &body)
 	if err != nil {
 		res.ServerError(w, err)
 		return
 	}
 
-	err = net.IsCSRF(body.CSRF)
+	err = lib.IsCSRF(body.CSRF)
 	if err != nil {
 		res.Forbidden(w)
 		return
@@ -38,9 +40,6 @@ func CreateCares(w http.ResponseWriter, r *http.Request) {
 
 	const locationKey model.ContextKey = "location"
 	location := r.Context().Value(locationKey).(model.Location)
-
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
 
 	cares := model.Cares{
 		User:              user.ID,
@@ -53,13 +52,13 @@ func CreateCares(w http.ResponseWriter, r *http.Request) {
 	cares.Timestamp()
 
 	coll := db.Collection(client, "cares")
-	err = cares.SetReplacementCode(ctx, coll)
+	err = cares.SetReplacementCode(context.Background(), coll)
 	if err != nil {
 		res.ServerError(w, err)
 		return
 	}
 
-	_, err = coll.InsertOne(ctx, cares)
+	_, err = coll.InsertOne(context.Background(), cares)
 	if err != nil {
 		res.ServerError(w, err)
 		return

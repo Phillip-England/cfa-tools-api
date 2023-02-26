@@ -1,6 +1,7 @@
 package ctrl
 
 import (
+	"context"
 	"log"
 	"net/http"
 	"time"
@@ -8,12 +9,12 @@ import (
 	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
-	"github.com/phillip-england/go-http/net"
 	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
+func UpdateUserPassword(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
 	type requestBody struct {
 		CurrentPassword string `json:"currentPassword"`
@@ -22,13 +23,13 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 	}
 
 	body := requestBody{}
-	err := net.GetBody(w, r, &body)
+	err := lib.GetBody(w, r, &body)
 	if err != nil {
 		res.ServerError(w, err)
 		return
 	}
 
-	err = net.IsCSRF(body.CSRF)
+	err = lib.IsCSRF(body.CSRF)
 	if err != nil {
 		log.Println(err)
 		res.Forbidden(w)
@@ -55,8 +56,6 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
 	coll := db.Collection(client, "users")
 
 	filter := bson.D{{
@@ -65,7 +64,7 @@ func UpdateUserPassword(w http.ResponseWriter, r *http.Request) {
 			{Key: "updated_at", Value: time.Now()},
 		},
 	}}
-	_, err = coll.UpdateByID(ctx, user.ID, filter)
+	_, err = coll.UpdateByID(context.Background(), user.ID, filter)
 	if err != nil {
 		res.ServerError(w, err)
 		return

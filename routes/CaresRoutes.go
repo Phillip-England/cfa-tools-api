@@ -5,11 +5,12 @@ import (
 
 	ctrl "github.com/phillip-england/go-http/ctrl/cares"
 	"github.com/phillip-england/go-http/mid"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func CaresRoutes() {
+func CaresRoutes(client *mongo.Client) {
 
-	http.HandleFunc("/cares/delete/", mid.Handler(ctrl.DeleteCares, mid.Options{
+	http.HandleFunc("/cares/delete/", mid.Handler(ctrl.DeleteCares, client, mid.Options{
 		CORS: true,
 		Preflight: true,
 		Method: "DELETE",
@@ -17,7 +18,7 @@ func CaresRoutes() {
 		Location: true,
 	}))
 
-	http.HandleFunc("/cares/create", mid.Handler(ctrl.CreateCares, mid.Options{
+	http.HandleFunc("/cares/create", mid.Handler(ctrl.CreateCares, client, mid.Options{
 		CORS: true,
 		Preflight: true,
 		Method: "POST",
@@ -25,7 +26,7 @@ func CaresRoutes() {
 		Location: true,
 	}))
 
-	http.HandleFunc("/cares/get/all", mid.Handler(ctrl.GetAllCares, mid.Options{
+	http.HandleFunc("/cares/get/all", mid.Handler(ctrl.GetAllCares, client, mid.Options{
 		CORS: true,
 		Preflight: true,
 		Method: "GET",
@@ -33,7 +34,7 @@ func CaresRoutes() {
 		Location: true,
 	}))
 
-	http.HandleFunc("/cares/update/", mid.Handler(ctrl.UpdateCares, mid.Options{
+	http.HandleFunc("/cares/update/", mid.Handler(ctrl.UpdateCares, client, mid.Options{
 		CORS: true,
 		Preflight: true,
 		Method: "PUT",

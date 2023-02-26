@@ -3,13 +3,14 @@ package ctrl
 import (
 	"net/http"
 
-	"github.com/phillip-england/go-http/net"
+	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/res"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func LogoutUser(w http.ResponseWriter, r *http.Request) {
+func LogoutUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
-	net.HttpCookie(w, "token", "", -10)
-	net.HttpCookie(w, "refresh", "", -10)
+	lib.HttpCookie(w, "token", "", -10)
+	lib.HttpCookie(w, "refresh", "", -10)
 	res.Success(w)
 }

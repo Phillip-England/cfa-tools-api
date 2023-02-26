@@ -1,6 +1,7 @@
 package ctrl
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 
@@ -8,9 +9,10 @@ import (
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/res"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func GetAllCares(w http.ResponseWriter, r *http.Request) {
+func GetAllCares(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
 	// const userKey model.ContextKey = "user"
 	// user := r.Context().Value(userKey).(model.User)
@@ -18,21 +20,19 @@ func GetAllCares(w http.ResponseWriter, r *http.Request) {
 	const locationKey model.ContextKey = "location"
 	location := r.Context().Value(locationKey).(model.Location)
 
-	ctx, client, disconnect := db.Connect()
-	defer disconnect()
 	coll := db.Collection(client, "cares")
 
 	filter := bson.D{{Key: "location", Value: location.ID}}
 
-	cursor, err := coll.Find(ctx, filter)
+	cursor, err := coll.Find(context.Background(), filter)
 	if err != nil {
 		res.ServerError(w, err)
 		return
 	}
-	defer cursor.Close(ctx)
+	defer cursor.Close(context.Background())
 
 	var allCares []model.Cares
-	for cursor.Next(ctx) {
+	for cursor.Next(context.Background()) {
 		var cares model.Cares
 		if err := cursor.Decode(&cares); err != nil {
 			res.ServerError(w, err)
