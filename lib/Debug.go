@@ -2,6 +2,7 @@ package lib
 
 import (
 	"fmt"
+	"log"
 	"reflect"
 )
 
@@ -13,4 +14,8 @@ func PrintType(v interface{}) {
 		fieldValue := vValue.Field(i)
 		fmt.Printf("%s: %v\n", field.Name, fieldValue.Interface())
 	}
+}
+
+func TestLog() {
+	log.Println("======================================================================================================")
 }

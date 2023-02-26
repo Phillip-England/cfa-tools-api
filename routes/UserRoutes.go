@@ -14,14 +14,12 @@ func UserRoutes(client *mongo.Client) {
 		CORS:      true,
 		Preflight: true,
 		Method:    "POST",
-		CSRF:      true,
 	}))
 
 	http.HandleFunc("/user/login", mid.Handler(ctrl.LoginUser, client, mid.Options{
 		CORS:      true,
 		Preflight: true,
 		Method:    "POST",
-		CSRF:      true,
 	}))
 
 	http.HandleFunc("/user/deleteall", mid.Handler(ctrl.DeleteAllUsers, client, mid.Options{
@@ -48,7 +46,6 @@ func UserRoutes(client *mongo.Client) {
 		CORS:      true,
 		Preflight: true,
 		Method:    "PUT",
-		CSRF:      true,
 		Auth:      true,
 	}))
 

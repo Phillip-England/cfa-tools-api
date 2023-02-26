@@ -30,14 +30,6 @@ func Handler(controller func(client *mongo.Client, w http.ResponseWriter, r *htt
 			return
 		}
 
-		if options.CSRF {
-			response := CSRF(w, r)
-			if response != nil {
-				response()
-				return
-			}
-		}
-
 		if options.Auth {
 			var response func()
 			ctx, response = Auth(client, w, r)

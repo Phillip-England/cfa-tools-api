@@ -18,12 +18,19 @@ func CreateUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	type requestBody struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
+		CSRF     string `json:"_csrf"`
 	}
 
 	body := requestBody{}
 	err := lib.GetBody(w, r, &body)
 	if err != nil {
 		res.ServerError(w, err)
+		return
+	}
+
+	err = lib.IsCSRF(body.CSRF)
+	if err != nil {
+		res.Forbidden(w)
 		return
 	}
 

@@ -22,7 +22,6 @@ func CaresRoutes(client *mongo.Client) {
 		CORS:      true,
 		Preflight: true,
 		Method:    "POST",
-		CSRF:      true,
 		Auth:      true,
 		Location:  true,
 	}))
@@ -39,7 +38,6 @@ func CaresRoutes(client *mongo.Client) {
 		CORS:      true,
 		Preflight: true,
 		Method:    "PUT",
-		CSRF:      true,
 		Auth:      true,
 		Location:  true,
 	}))

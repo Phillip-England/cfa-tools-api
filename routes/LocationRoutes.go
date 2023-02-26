@@ -14,7 +14,6 @@ func LocationRoutes(client *mongo.Client) {
 		CORS:      true,
 		Preflight: true,
 		Method:    "POST",
-		CSRF:      true,
 		Auth:      true,
 	}))
 
@@ -43,7 +42,6 @@ func LocationRoutes(client *mongo.Client) {
 		CORS:      true,
 		Preflight: true,
 		Method:    "PUT",
-		CSRF:      true,
 		Auth:      true,
 	}))
 
