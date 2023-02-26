@@ -11,42 +11,45 @@ import (
 func UserRoutes(client *mongo.Client) {
 
 	http.HandleFunc("/user/create", mid.Handler(ctrl.CreateUser, client, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "POST",
+		Method:    "POST",
+		CSRF:      true,
 	}))
 
 	http.HandleFunc("/user/login", mid.Handler(ctrl.LoginUser, client, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "POST",
+		Method:    "POST",
+		CSRF:      true,
 	}))
 
 	http.HandleFunc("/user/deleteall", mid.Handler(ctrl.DeleteAllUsers, client, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "DELETE",
+		Method:    "DELETE",
 	}))
 
 	http.HandleFunc("/user/get", mid.Handler(ctrl.GetUser, client, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "GET",
-		Auth: true,
+		Method:    "GET",
+		Auth:      true,
 	}))
 
 	http.HandleFunc("/user/logout", mid.Handler(ctrl.LogoutUser, client, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "GET",
-		Auth: true,
+		Method:    "GET",
+		Auth:      true,
 	}))
 
 	http.HandleFunc("/user/update/password", mid.Handler(ctrl.UpdateUserPassword, client, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "PUT",
-		Auth: true,
+		Method:    "PUT",
+		CSRF:      true,
+		Auth:      true,
 	}))
 
 }

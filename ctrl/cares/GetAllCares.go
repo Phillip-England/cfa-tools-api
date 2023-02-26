@@ -14,11 +14,7 @@ import (
 
 func GetAllCares(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
-	// const userKey model.ContextKey = "user"
-	// user := r.Context().Value(userKey).(model.User)
-
-	const locationKey model.ContextKey = "location"
-	location := r.Context().Value(locationKey).(model.Location)
+	location := r.Context().Value(model.GetLocationKey()).(model.Location)
 
 	coll := db.Collection(client, "cares")
 
@@ -43,7 +39,7 @@ func GetAllCares(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
 	httpResponse := model.HttpResponse{
 		Message: "success",
-		Data: allCares,
+		Data:    allCares,
 	}
 
 	jsonData, err := json.Marshal(httpResponse)

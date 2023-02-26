@@ -35,11 +35,8 @@ func CreateCares(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	const userKey model.ContextKey = "user"
-	user := r.Context().Value(userKey).(model.User)
-
-	const locationKey model.ContextKey = "location"
-	location := r.Context().Value(locationKey).(model.Location)
+	user := r.Context().Value(model.GetUserKey()).(model.User)
+	location := r.Context().Value(model.GetLocationKey()).(model.Location)
 
 	cares := model.Cares{
 		User:              user.ID,

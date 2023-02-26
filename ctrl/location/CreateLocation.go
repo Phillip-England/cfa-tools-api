@@ -32,8 +32,7 @@ func CreateLocation(client *mongo.Client, w http.ResponseWriter, r *http.Request
 		return
 	}
 
-	const userKey model.ContextKey = "user"
-	user := r.Context().Value(userKey).(model.User)
+	user := r.Context().Value(model.GetUserKey()).(model.User)
 
 	location, err := model.BuildLocation(user.ID, body.Name, body.Number)
 	if err != nil {

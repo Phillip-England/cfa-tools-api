@@ -45,8 +45,7 @@ func UpdateCares(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	const locationKey model.ContextKey = "location"
-	location := r.Context().Value(locationKey).(model.Location)
+	location := r.Context().Value(model.GetLocationKey()).(model.Location)
 
 	coll := db.Collection(client, "cares")
 
@@ -80,7 +79,7 @@ func UpdateCares(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 		res.ServerError(w, err)
 		return
 	}
-	
+
 	res.Success(w)
 
 }

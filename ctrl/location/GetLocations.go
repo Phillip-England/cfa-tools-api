@@ -14,8 +14,7 @@ import (
 
 func GetLocations(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
-	const userKey model.ContextKey = "user"
-	user := r.Context().Value(userKey).(model.User)
+	user := r.Context().Value(model.GetUserKey()).(model.User)
 
 	coll := db.Collection(client, "locations")
 

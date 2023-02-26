@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-func Handler(controller func(client *mongo.Client, w http.ResponseWriter, r *http.Request), client *mongo.Client,  options Options) http.HandlerFunc {
+func Handler(controller func(client *mongo.Client, w http.ResponseWriter, r *http.Request), client *mongo.Client, options Options) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 
 		var ctx context.Context = nil
@@ -28,6 +28,14 @@ func Handler(controller func(client *mongo.Client, w http.ResponseWriter, r *htt
 		if r.Method != options.Method {
 			res.InvalidRequestMethod(w)
 			return
+		}
+
+		if options.CSRF {
+			response := CSRF(w, r)
+			if response != nil {
+				response()
+				return
+			}
 		}
 
 		if options.Auth {

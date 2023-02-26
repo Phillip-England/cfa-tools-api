@@ -36,8 +36,7 @@ func UpdateUserPassword(client *mongo.Client, w http.ResponseWriter, r *http.Req
 		return
 	}
 
-	const userKey model.ContextKey = "user"
-	user := r.Context().Value(userKey).(model.User)
+	user := r.Context().Value(model.GetUserKey()).(model.User)
 
 	password, err := user.GetDecryptedPassword()
 	if err != nil {

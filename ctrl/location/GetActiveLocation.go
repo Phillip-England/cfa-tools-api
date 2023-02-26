@@ -15,8 +15,7 @@ import (
 
 func GetActiveLocation(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 
-	const userKey model.ContextKey = "user"
-	user := r.Context().Value(userKey).(model.User)
+	user := r.Context().Value(model.GetUserKey()).(model.User)
 
 	cookie, err := r.Cookie("location")
 	if err != nil {

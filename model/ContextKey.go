@@ -2,11 +2,6 @@ package model
 
 type ContextKey string
 
-func GetDbKey() (key ContextKey) {
-	key = "db"
-	return key
-}
-
 func GetUserKey() (key ContextKey) {
 	key = "user"
 	return key

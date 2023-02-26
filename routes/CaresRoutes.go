@@ -11,35 +11,37 @@ import (
 func CaresRoutes(client *mongo.Client) {
 
 	http.HandleFunc("/cares/delete/", mid.Handler(ctrl.DeleteCares, client, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "DELETE",
-		Auth: true,
-		Location: true,
+		Method:    "DELETE",
+		Auth:      true,
+		Location:  true,
 	}))
 
 	http.HandleFunc("/cares/create", mid.Handler(ctrl.CreateCares, client, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "POST",
-		Auth: true,
-		Location: true,
+		Method:    "POST",
+		CSRF:      true,
+		Auth:      true,
+		Location:  true,
 	}))
 
 	http.HandleFunc("/cares/get/all", mid.Handler(ctrl.GetAllCares, client, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "GET",
-		Auth: true,
-		Location: true,
+		Method:    "GET",
+		Auth:      true,
+		Location:  true,
 	}))
 
 	http.HandleFunc("/cares/update/", mid.Handler(ctrl.UpdateCares, client, mid.Options{
-		CORS: true,
+		CORS:      true,
 		Preflight: true,
-		Method: "PUT",
-		Auth: true,
-		Location: true,
+		Method:    "PUT",
+		CSRF:      true,
+		Auth:      true,
+		Location:  true,
 	}))
 
 }
