@@ -15,6 +15,7 @@ import (
 
 func Auth(client *mongo.Client, w http.ResponseWriter, r *http.Request) (httpctx context.Context, response func()) {
 
+
 	token, tokenErr := r.Cookie("token")
 	refresh, refreshErr := r.Cookie("refresh")
 	var jwtData interface{}
@@ -25,7 +26,7 @@ func Auth(client *mongo.Client, w http.ResponseWriter, r *http.Request) (httpctx
 			res.Unauthorized(w)
 		}
 	}
-
+	
 	if tokenErr == nil && refreshErr != nil || tokenErr == nil && refreshErr == nil {
 		jwtData, err = lib.DecodeJWT(token.Value)
 		if err != nil {
@@ -34,7 +35,8 @@ func Auth(client *mongo.Client, w http.ResponseWriter, r *http.Request) (httpctx
 			}
 		}
 	}
-
+	
+	
 	if tokenErr != nil && refreshErr == nil {
 		jwtData, err = lib.DecodeJWT(refresh.Value)
 		if err != nil {

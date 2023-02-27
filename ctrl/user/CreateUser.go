@@ -2,6 +2,7 @@ package ctrl
 
 import (
 	"context"
+	"log"
 	"net/http"
 
 	"github.com/phillip-england/go-http/db"
@@ -18,7 +19,6 @@ func CreateUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	type requestBody struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
-		CSRF     string `json:"_csrf"`
 	}
 
 	body := requestBody{}
@@ -28,11 +28,7 @@ func CreateUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = lib.IsCSRF(body.CSRF)
-	if err != nil {
-		res.Forbidden(w)
-		return
-	}
+	log.Println(body)
 
 	user, err := model.BuildUser(body.Email, body.Password)
 	if err != nil {

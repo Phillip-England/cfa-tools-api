@@ -2,12 +2,14 @@ package ctrl
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/res"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -42,11 +44,29 @@ func CreateLocation(client *mongo.Client, w http.ResponseWriter, r *http.Request
 
 	coll := db.Collection(client, "locations")
 
-	_, err = coll.InsertOne(context.Background(), location)
+	result, err := coll.InsertOne(context.Background(), location)
 	if err != nil {
 		res.ServerError(w, err)
 		return
 	}
 
-	res.Success(w)
+	id := result.InsertedID.(primitive.ObjectID)
+	location.ID = id
+	
+
+	httpResponse := model.HttpResponse{
+		Message: "success",
+		Data:    location,
+		CSRF:    nil,
+	}
+
+	jsonData, err := json.Marshal(httpResponse)
+	if err != nil {
+		res.ServerError(w, err)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write(jsonData)
+
 }
