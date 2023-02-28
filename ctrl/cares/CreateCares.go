@@ -2,12 +2,14 @@ package ctrl
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/phillip-england/go-http/db"
 	"github.com/phillip-england/go-http/lib"
 	"github.com/phillip-england/go-http/model"
 	"github.com/phillip-england/go-http/res"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
@@ -55,12 +57,27 @@ func CreateCares(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = coll.InsertOne(context.Background(), cares)
+	result, err := coll.InsertOne(context.Background(), cares)
 	if err != nil {
 		res.ServerError(w, err)
 		return
 	}
 
-	res.Success(w)
+	cares.ID = result.InsertedID.(primitive.ObjectID)
+
+	httpResponse := model.HttpResponse{
+		Message: "success",
+		Data:    cares,
+		CSRF:    nil,
+	}
+
+	jsonData, err := json.Marshal(httpResponse)
+	if err != nil {
+		res.ServerError(w, err)
+		return
+	}
+
+	w.WriteHeader(200)
+	w.Write(jsonData)
 
 }
