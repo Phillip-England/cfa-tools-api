@@ -24,10 +24,9 @@ func GetSingleCares(client *mongo.Client, w http.ResponseWriter, r *http.Request
 	}
 
 
-	// location := r.Context().Value(model.GetLocationKey()).(model.Location)
+	location := r.Context().Value(model.GetLocationKey()).(model.Location)
 
 	coll := db.Collection(client, "cares")
-
 	filter := bson.D{{Key: "_id", Value: caresID}}
 
 	var cares model.Cares
@@ -37,6 +36,11 @@ func GetSingleCares(client *mongo.Client, w http.ResponseWriter, r *http.Request
 		return
 	} else if err != nil {
 		res.ServerError(w, err)
+		return
+	}
+
+	if (cares.Location != location.ID) {
+		res.Forbidden(w)
 		return
 	}
 
