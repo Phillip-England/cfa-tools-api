@@ -42,4 +42,12 @@ func CaresRoutes(client *mongo.Client) {
 		Location:  true,
 	}))
 
+	http.HandleFunc("/cares/", mid.Handler(ctrl.GetSingleCares, client, mid.Options{
+		CORS:      true,
+		Preflight: true,
+		Method:    "GET",
+		Auth:      true,
+		Location:  true,
+	}))
+
 }
