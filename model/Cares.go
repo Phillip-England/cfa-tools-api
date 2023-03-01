@@ -35,7 +35,7 @@ func (v *Cares) Timestamp() {
 func (v *Cares) SetReplacementCode(ctx context.Context, coll *mongo.Collection) (err error) {
 
 	pipeline := mongo.Pipeline{
-		{{Key: "$match", Value: bson.D{{Key: "user", Value: v.User}}}},
+		{{Key: "$match", Value: bson.D{{Key: "user", Value: v.User}, {Key: "location", Value: v.Location}}}},
 		{{Key: "$sort", Value: bson.D{{Key: "replacementCode", Value: -1}}}},
 		{{Key: "$limit", Value: 1}},
 		{{Key: "$project", Value: bson.D{{Key: "replacementCode", Value: 1}, {Key: "_id", Value: nil}}}},
