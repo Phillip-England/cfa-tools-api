@@ -2,7 +2,6 @@ package ctrl
 
 import (
 	"context"
-	"log"
 	"net/http"
 
 	"github.com/phillip-england/go-http/db"
@@ -28,11 +27,21 @@ func CreateUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	log.Println(body)
-
 	user, err := model.BuildUser(body.Email, body.Password)
 	if err != nil {
 		res.ServerError(w, err)
+	}
+
+	err = user.Validate()
+	if err != nil {
+		res.MessageResponse(w, err.Error(), 400)
+		return
+	}
+
+	err = user.EncryptPassword()
+	if err != nil {
+		res.ServerError(w, err)
+		return
 	}
 
 	coll := db.Collection(client, "users")
@@ -41,7 +50,7 @@ func CreateUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	filter := bson.D{{Key: "email", Value: user.Email}}
 	err = coll.FindOne(context.Background(), filter).Decode(&userExists)
 	if userExists.Email == user.Email && err != mongo.ErrNoDocuments {
-		res.MessageResponse(w, "user already exists", 400)
+		res.MessageResponse(w, "User already exists", 400)
 		return
 	}
 	if err != mongo.ErrNoDocuments && err != nil {

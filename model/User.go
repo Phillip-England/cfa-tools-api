@@ -22,14 +22,13 @@ type UserResponse struct {
 }
 
 func BuildUser(email string, password string) (user User, err error) {
-	encryptedPassword, err := lib.Encrypt([]byte(password))
 	email = strings.ToLower(email)
 	if err != nil {
 		return User{}, err
 	}
 	user = User{
 		Email:    email,
-		Password: string(encryptedPassword),
+		Password: password,
 	}
 	user.Timestamp()
 	return user, nil
@@ -43,11 +42,32 @@ func (v *User) Timestamp() {
 	v.UpdatedAt = now
 }
 
-func (user *User) GetDecryptedPassword() (password string, err error) {
-	passwordBytes, err := lib.Decrypt([]byte(user.Password))
+func (v *User) EncryptPassword() (err error) {
+	encryptedPassword, err := lib.Encrypt([]byte(v.Password))
+	if err != nil {
+		return err
+	}
+	v.Password = string(encryptedPassword)
+	return nil
+} 
+
+func (v *User) GetDecryptedPassword() (password string, err error) {
+	passwordBytes, err := lib.Decrypt([]byte(v.Password))
 	if err != nil {
 		return "", err
 	}
 	password = string(passwordBytes)
 	return password, nil
+}
+
+func (v *User) Validate() (err error) {
+	err = lib.IsValidEmail(v.Email)
+	if err != nil {
+		return err
+	}
+	err = lib.IsValidPassword(v.Password)
+	if err != nil {
+		return err
+	}
+	return nil
 }
