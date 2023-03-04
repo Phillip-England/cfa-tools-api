@@ -27,6 +27,7 @@ func LoginUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+
 	body.Email = strings.ToLower(body.Email)
 
 	coll := db.Collection(client, "users")

@@ -18,12 +18,18 @@ func CreateUser(client *mongo.Client, w http.ResponseWriter, r *http.Request) {
 	type requestBody struct {
 		Email    string `json:"email"`
 		Password string `json:"password"`
+		ConfirmPassword string `json:"confirmPassword"`
 	}
 
 	body := requestBody{}
 	err := lib.GetBody(w, r, &body)
 	if err != nil {
 		res.ServerError(w, err)
+		return
+	}
+
+	if body.Password != body.ConfirmPassword {
+		res.BadReqeust(w, "passwords must match")
 		return
 	}
 
